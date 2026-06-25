@@ -1,0 +1,5 @@
+{
+  "caixa": 1,
+  "tipo": "Normal",
+  "serverUrl": "ws://localhost:3040"
+}

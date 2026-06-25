@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Chamador de Caixa Pro</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --sidebar-bg: #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-active: #059669;
+      --primary: #059669;
+      --primary-hover: #047857;
+      --primary-light: #d1fae5;
+      --accent: #0ea5e9;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --transition: all 0.2s ease;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sidebar-header img {
+      height: 36px;
+      width: 36px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.2;
+    }
+
+    .sidebar-header small {
+      font-size: 0.7rem;
+      color: var(--sidebar-text);
+      font-weight: 500;
+    }
+
+    .sidebar-nav {
+      padding: 0.75rem;
+      flex: 1;
+    }
+
+    .nav-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .nav-section-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #475569;
+      padding: 0 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.625rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: var(--transition);
+      color: var(--sidebar-text);
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.06);
+      color: #e2e8f0;
+    }
+
+    .nav-item.active {
+      background: rgba(5,150,105,0.15);
+      color: var(--sidebar-active);
+    }
+
+    .nav-item .icon {
+      width: 20px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.7rem;
+      color: #475569;
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      margin-left: 260px;
+      flex: 1;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .card:hover { box-shadow: var(--shadow-md); }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title .icon {
+      font-size: 1.15rem;
+    }
+
+    /* GRID LAYOUTS */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+    /* STAT CARDS */
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.green { background: var(--primary-light); }
+    .stat-icon.blue { background: #e0f2fe; }
+    .stat-icon.yellow { background: #fef3c7; }
+    .stat-icon.red { background: #fee2e2; }
+    .stat-icon.purple { background: #f3e8ff; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    .stat-value.ok { color: var(--success); }
+    .stat-value.warning { color: var(--warning); }
+    .stat-value.error { color: var(--danger); }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.375rem;
+      color: var(--text);
+    }
+
+    input[type="text"], input[type="number"], input[type="file"], select {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: var(--transition);
+      background: #f8fafc;
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+      background: #fff;
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      gap: 0.5rem;
+      font-family: inherit;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-accent:hover { background: #0284c7; }
+
+    .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
+
+    .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* LIST ITEMS */
+    .item-list {
+      list-style: none;
+      margin-top: 0.75rem;
+    }
+
+    .item-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+
+    .item-list li:hover { border-color: var(--primary); }
+
+    /* TOGGLE */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #cbd5e1;
+      transition: var(--transition);
+      border-radius: 24px;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      transition: var(--transition);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background: var(--primary); }
+    input:checked + .slider::before { transform: translateX(20px); }
+
+    /* STATUS BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-green { background: var(--primary-light); color: var(--primary); }
+    .badge-red { background: #fee2e2; color: var(--danger); }
+    .badge-yellow { background: #fef3c7; color: #b45309; }
+    .badge-blue { background: #e0f2fe; color: #0369a1; }
+
+    /* HEALTH MONITOR */
+    .health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+
+    .health-card {
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    .health-card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .health-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .health-dot.green { background: var(--success); }
+    .health-dot.yellow { background: var(--warning); }
+    .health-dot.red { background: var(--danger); }
+    .health-dot.gray { background: #94a3b8; }
+
+    .health-detail {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* LIVE PREVIEW */
+    .preview-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .preview-label {
+      background: #f1f5f9;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-content {
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 70px;
+    }
+
+    /* MODALS */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .modal-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .modal-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    /* TOAST */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      background: var(--text);
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.85rem;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: var(--primary); }
+    .toast.error { background: var(--danger); }
+
+    /* SECTIONS (hidden by default) */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+    }
+
+    .section-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="logo.png" alt="Logo">
+      <div>
+        <h1>Chamador PRO</h1>
+        <small>Painel Administrativo</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Principal</div>
+        <a class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+          <span class="icon">&#9632;</span> Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Gestao</div>
+        <a class="nav-item" data-section="chamadas" onclick="showSection('chamadas')">
+          <span class="icon">&#128276;</span> Chamadas
+        </a>
+        <a class="nav-item" data-section="midias" onclick="showSection('midias')">
+          <span class="icon">&#128193;</span> Midias
+        </a>
+        <a class="nav-item" data-section="streams" onclick="showSection('streams')">
+          <span class="icon">&#128250;</span> YouTube Streams
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Esportes</div>
+        <a class="nav-item" data-section="copa" onclick="showSection('copa')">
+          <span class="icon">&#127942;</span> Copa do Mundo
+        </a>
+        <a class="nav-item" data-section="health" onclick="showSection('health')">
+          <span class="icon">&#128165;</span> Saude da API
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Sistema</div>
+        <a class="nav-item" data-section="institucional" onclick="showSection('institucional')">
+          <span class="icon">&#127970;</span> Institucional
+        </a>
+        <a class="nav-item" data-section="configuracoes" onclick="showSection('configuracoes')">
+          <span class="icon">&#9881;</span> Configuracoes
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      Chamador de Caixa Pro v2.0
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div id="sec-dashboard" class="section active">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Visao geral do sistema em tempo real</p>
+      </div>
+
+      <div id="statBar" class="grid-4" style="margin-bottom: 1.5rem;"></div>
+
+      <div class="grid-2">
+        <!-- LIVE PREVIEW -->
+        <div class="card">
+          <div class="card-title"><span class="icon">&#128065;</span> Pre-visualizacao do Telao</div>
+          <div class="preview-box">
+            <div class="preview-label">
+              <span>Cabecalho ativo</span>
+              <span style="color:var(--success);">&#9679; AO VIVO</span>
+            </div>
+            <div class="preview-content">
+              <div id="prevLeft" style="flex:1.2; display:flex; align-items:center;">
+                <span id="prevLogoFallback" style="font-size:1.1rem; font-weight:800; color:#0f172a;">Nome Empresa</span>
+                <img id="prevLogoImg" src="" style="max-height:40px; max-width:140px; object-fit:contain; display:none;" alt="Logo">
+              </div>
+              <div id="prevCenter" style="flex:2; text-align:center; padding:0 8px;">
+                <div id="prevSlogan" style="font-size:0.85rem; font-weight:700; color:#334155; display:none;"></div>
+                <div id="prevInfo" style="font-size:0.7rem; color:#64748b; margin-top:2px; display:none;"></div>
+              </div>
+              <div style="flex:1; display:flex; align-items:center; justify-content:flex-end; gap:8px;">
+                <img id="prevQRCodeImg" src="" style="height:34px; width:34px; object-fit:contain; display:none;" alt="QR">
+                <span id="prevClock" style="font-size:1.2rem; font-weight:800; color:#0f172a;">00:00:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAPID ACTIONS -->
+        <div class="card">
+          <div class="card-title"><span class="icon">&#9889;</span> Acoes Rapidas</div>
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <div class="toggle-row">
+              <label class="switch">
+                <input type="checkbox" id="somMidiaCheckbox">
+                <span class="slider"></span>
+              </label>
+              <span style="font-size:0.9rem; font-weight:600;">Som nas midias</span>
+            </div>
+            <div class="toggle-row">
+              <label class="switch">
+                <input type="checkbox" id="eventoCheckbox">
+                <span class="slider"></span>
+              </label>
+              <span style="font-size:0.9rem; font-weight:600;">Modo Evento</span>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--border);">
+            <div class="card-title" style="border:none; padding:0; margin:0;"><span class="icon">&#128276;</span> Teste de Chamada</div>
+            <div class="form-row">
+              <div class="form-group" style="margin:0;">
+                <label>Caixa #</label>
+                <input type="number" id="testeCaixaNum" value="1" min="1" max="99">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label>Tipo</label>
+                <select id="testeCaixaTipo">
+                  <option value="Normal">Normal</option>
+                  <option value="Preferencial">Preferencial</option>
+                  <option value="Rapido">Rapido</option>
+                </select>
+              </div>
+            </div>
+            <button type="button" onclick="testarChamadaForm()" class="btn btn-primary" style="width:100%;">Chamar Caixa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CHAMADAS ==================== -->
+    <div id="sec-chamadas" class="section">
+      <div class="page-header">
+        <h2>Controle de Chamadas</h2>
+        <p>Historico e simulacao de chamadas dos caixas</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#128276;</span> Simular Chamada</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Numero do Caixa</label>
+            <input type="number" id="testeCaixaNum2" value="1" min="1" max="99">
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="testeCaixaTipo2">
+              <option value="Normal">Normal</option>
+              <option value="Preferencial">Preferencial</option>
+              <option value="Rapido">Rapido</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" onclick="testarChamadaForm2()" class="btn btn-primary">Enviar Chamada</button>
+        <div style="margin-top:1rem;">
+          <div class="card-title" style="font-size:0.95rem;"><span class="icon">&#128203;</span> Historico</div>
+          <ul id="chamadasList" class="item-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MIDIAS ==================== -->
+    <div id="sec-midias" class="section">
+      <div class="page-header">
+        <h2>Gerenciador de Midias</h2>
+        <p>Upload, ordem e configuracao de midias do telao</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="icon">&#128228;</span> Upload de Midia</div>
+          <form id="mediaForm">
+            <div class="form-group">
+              <label>Arquivo (imagem ou video)</label>
+              <input type="file" id="mediaFile" accept="image/*,video/mp4" required>
+            </div>
+            <div class="form-group">
+              <label>Duracao (segundos, para imagens)</label>
+              <input type="number" id="mediaTempo" placeholder="Ex: 10" value="10">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;" id="btnUploadMedia">
+              Enviar Midia
+            </button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">&#127916;</span> Midias na Fila</div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">Arraste para reordenar, ative/desative ou configure cada midia.</p>
+          <ul id="mediaList" class="item-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== STREAMS ==================== -->
+    <div id="sec-streams" class="section">
+      <div class="page-header">
+        <h2>YouTube Streams</h2>
+        <p>Gerencie transmissoes ao vivo no telao</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="icon">&#10133;</span> Adicionar Stream</div>
+          <form id="streamForm">
+            <div class="form-group">
+              <label>URL do video ou live do YouTube</label>
+              <input type="text" id="streamUrl" placeholder="https://www.youtube.com/watch?v=..." required>
+            </div>
+            <button type="submit" class="btn btn-accent" style="width:100%;">Adicionar</button>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">&#128250;</span> Streams Cadastradas</div>
+          <ul id="streamList" class="item-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== COPA DO MUNDO ==================== -->
+    <div id="sec-copa" class="section">
+      <div class="page-header">
+        <h2>Copa do Mundo 2026</h2>
+        <p>Configuracoes do painel esportivo e fontes de dados</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#127942;</span> Configuracoes da Copa</div>
+        <div id="sportsApiStatusBox" style="padding:0.75rem; background:#f8fafc; border:1px solid var(--border); border-radius:8px; margin-bottom:1rem; font-size:0.85rem;">
+          <strong style="color:var(--text);">Status:</strong> <span id="lblSportsApiStatus">Verificando...</span><br>
+          <strong style="color:var(--text);">Ultima Atualizacao:</strong> <span id="lblSportsApiLastUpdate">-</span><br>
+          <strong style="color:var(--danger); display:none;" id="lblSportsApiError"></strong>
+        </div>
+        <form id="sportsForm">
+          <div class="toggle-row" style="margin-bottom:0.5rem;">
+            <label class="switch">
+              <input type="checkbox" id="esportesAtivo">
+              <span class="slider"></span>
+            </label>
+            <span style="font-weight:600;">Ativar Painel Copa</span>
+          </div>
+          <div class="toggle-row" style="margin-bottom:1rem;">
+            <label class="switch">
+              <input type="checkbox" id="esportesFallback">
+              <span class="slider"></span>
+            </label>
+            <span style="font-weight:500; font-size:0.85rem;">Exibir automaticamente se YouTube falhar</span>
+          </div>
+          <div class="form-group">
+            <label>Fonte de Dados</label>
+            <select id="esportesFonteDados">
+              <option value="automatico">Automatico</option>
+              <option value="worldcup26">World Cup 2026 API</option>
+              <option value="football_data">Football-Data.org</option>
+              <option value="native_stats">Native Stats</option>
+            </select>
+          </div>
+          <div class="form-group" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+              <input type="checkbox" id="esportesMostrarJogosHoje"> Mostrar jogos de hoje
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+              <input type="checkbox" id="esportesMostrarProximos"> Mostrar proximos jogos
+            </label>
+            <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+              <input type="checkbox" id="esportesMostrarClassificacao"> Mostrar classificacao / grupos
+            </label>
+          </div>
+          <div class="btn-group" style="margin-top:1rem;">
+            <button type="submit" class="btn btn-primary" style="flex:1;">Salvar</button>
+            <button type="button" onclick="atualizarEsportesAgora()" class="btn btn-secondary" style="flex:1;">Atualizar Agora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== SAUDE DA API ==================== -->
+    <div id="sec-health" class="section">
+      <div class="page-header">
+        <h2>Saude da API</h2>
+        <p>Monitoramento em tempo real dos provedores de dados esportivos</p>
+      </div>
+      <div id="healthOverview" class="grid-4" style="margin-bottom:1.5rem;"></div>
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">&#128165;</span> Detalhes dos Provedores
+          <button onclick="carregarHealth()" class="btn btn-secondary btn-sm" style="margin-left:auto;">Atualizar</button>
+        </div>
+        <div id="healthDetails" class="health-grid"></div>
+      </div>
+    </div>
+
+    <!-- ==================== INSTITUCIONAL ==================== -->
+    <div id="sec-institucional" class="section">
+      <div class="page-header">
+        <h2>Pagina Institucional</h2>
+        <p>Gerencie slogan, logo, dados de contato e QR Code</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="icon">&#127970;</span> Dados do Estabelecimento</div>
+          <form id="institucionalForm">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Nome</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="instMostrarNome"> Exibir
+                </label>
+              </div>
+              <input type="text" id="instNome" placeholder="Ex: Mercantil Santa Paula">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Telefone</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="instMostrarTelefone"> Exibir
+                </label>
+              </div>
+              <input type="text" id="instTelefone" placeholder="(11) 3326-2888">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Site</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="instMostrarSite"> Exibir
+                </label>
+              </div>
+              <input type="text" id="instSite" placeholder="www.seusite.com.br">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Instagram</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="instMostrarInstagram"> Exibir
+                </label>
+              </div>
+              <input type="text" id="instInstagram" placeholder="@seuperfil">
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Slogan</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="instMostrarSlogan"> Exibir
+                </label>
+              </div>
+              <input type="text" id="instSlogan" placeholder="Qualidade e confianca">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Salvar Dados de Texto</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="icon">&#128247;</span> Imagens</div>
+
+          <div style="padding:0.75rem; background:#f8fafc; border:1px solid var(--border); border-radius:8px; margin-bottom:1rem;">
+            <label style="font-weight:700; font-size:0.85rem;">Logotipo</label>
+            <p style="font-size:0.72rem; color:var(--text-muted); margin:0.25rem 0 0.5rem;">Substitui o nome no cabecalho.</p>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="file" id="instLogoFile" accept="image/*" style="padding:0.4rem; font-size:0.8rem; flex:1;">
+              <button type="button" onclick="uploadLogo()" class="btn btn-primary btn-sm">Upload</button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem;">
+              <span id="logoStatusText" style="font-size:0.75rem; color:var(--text-muted);">Nenhum logo enviado.</span>
+              <button type="button" id="btnDeleteLogo" onclick="deleteLogo()" class="btn btn-danger btn-sm" style="display:none;">Excluir</button>
+            </div>
+          </div>
+
+          <div style="padding:0.75rem; background:#f8fafc; border:1px solid var(--border); border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label style="font-weight:700; font-size:0.85rem; margin:0;">QR Code</label>
+              <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; cursor:pointer; margin:0;">
+                <input type="checkbox" id="instMostrarQRCode"> Exibir
+              </label>
+            </div>
+            <p style="font-size:0.72rem; color:var(--text-muted); margin:0.25rem 0 0.5rem;">Exibido ao lado do relogio.</p>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="file" id="instQRCodeFile" accept="image/*" style="padding:0.4rem; font-size:0.8rem; flex:1;">
+              <button type="button" onclick="uploadQRCode()" class="btn btn-primary btn-sm">Upload</button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem;">
+              <span id="qrcodeStatusText" style="font-size:0.75rem; color:var(--text-muted);">Nenhum QR Code enviado.</span>
+              <button type="button" id="btnDeleteQRCode" onclick="deleteQRCode()" class="btn btn-danger btn-sm" style="display:none;">Excluir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CONFIGURACOES ==================== -->
+    <div id="sec-configuracoes" class="section">
+      <div class="page-header">
+        <h2>Configuracoes</h2>
+        <p>Configuracoes gerais do sistema</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">&#9881;</span> Configuracoes Gerais</div>
+        <p style="color:var(--text-muted); font-size:0.9rem;">As configuracoes de som e modo evento podem ser encontradas no Dashboard.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODALS -->
+  <div id="confirmModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 id="confirmTitle">Confirmar</h3>
+      <p id="confirmMessage">Tem certeza?</p>
+      <div class="modal-actions">
+        <button id="btnConfirmCancel" class="btn btn-secondary">Cancelar</button>
+        <button id="btnConfirmOk" class="btn btn-danger">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="promptModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 id="promptTitle">Editar</h3>
+      <p id="promptMessage">Digite o valor:</p>
+      <input type="number" id="promptInput" style="margin-bottom:1.5rem;">
+      <div class="modal-actions">
+        <button id="btnPromptCancel" class="btn btn-secondary">Cancelar</button>
+        <button id="btnPromptOk" class="btn btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="previewModal" class="modal-overlay" style="background:rgba(0,0,0,0.8);">
+    <div class="modal-card" style="max-width:600px;">
+      <h3 id="previewTitle">Preview</h3>
+      <div id="previewContent" style="display:flex; justify-content:center; align-items:center; min-height:200px; max-height:400px; overflow:hidden; border-radius:8px; background:#f1f5f9; margin-bottom:1.5rem;"></div>
+      <button type="button" onclick="fecharPreviewModal()" class="btn btn-primary" style="width:100%;">Fechar</button>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script>
+    // ===== NAVIGATION =====
+    function showSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const sec = document.getElementById('sec-' + name);
+      if (sec) sec.classList.add('active');
+      const nav = document.querySelector(`.nav-item[data-section="${name}"]`);
+      if (nav) nav.classList.add('active');
+    }
+
+    // ===== TOAST =====
+    function showToast(msg, type) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type || 'success');
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.classList.add('show'), 10);
+      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
+    // ===== MODALS =====
+    function showConfirm(title, msg, onOk) {
+      const m = document.getElementById('confirmModal');
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = msg;
+      m.classList.add('active');
+      const ok = document.getElementById('btnConfirmOk');
+      const cancel = document.getElementById('btnConfirmCancel');
+      const newOk = ok.cloneNode(true);
+      const newCancel = cancel.cloneNode(true);
+      ok.parentNode.replaceChild(newOk, ok);
+      cancel.parentNode.replaceChild(newCancel, cancel);
+      newOk.onclick = () => { m.classList.remove('active'); onOk(); };
+      newCancel.onclick = () => m.classList.remove('active');
+    }
+
+    function showPrompt(title, msg, def, onOk) {
+      const m = document.getElementById('promptModal');
+      document.getElementById('promptTitle').textContent = title;
+      document.getElementById('promptMessage').textContent = msg;
+      document.getElementById('promptInput').value = def;
+      m.classList.add('active');
+      const ok = document.getElementById('btnPromptOk');
+      const cancel = document.getElementById('btnPromptCancel');
+      const newOk = ok.cloneNode(true);
+      const newCancel = cancel.cloneNode(true);
+      ok.parentNode.replaceChild(newOk, ok);
+      cancel.parentNode.replaceChild(newCancel, cancel);
+      newOk.onclick = () => { m.classList.remove('active'); onOk(document.getElementById('promptInput').value); };
+      newCancel.onclick = () => m.classList.remove('active');
+    }
+
+    // ===== CLOCK =====
+    setInterval(() => {
+      const n = new Date();
+      const el = document.getElementById('prevClock');
+      if (el) el.textContent = [n.getHours(), n.getMinutes(), n.getSeconds()].map(x => String(x).padStart(2, '0')).join(':');
+    }, 1000);
+
+    // ===== GLOBAL DATA =====
+    let globalInstData = {};
+    window.currentMidiasIds = [];
+
+    // ===== LIVE PREVIEW =====
+    function updateLivePreview() {
+      const nome = document.getElementById('instNome').value;
+      const telefone = document.getElementById('instTelefone').value;
+      const site = document.getElementById('instSite').value;
+      const instagram = document.getElementById('instInstagram').value;
+      const slogan = document.getElementById('instSlogan').value;
+
+      const logoImg = document.getElementById('prevLogoImg');
+      const logoFallback = document.getElementById('prevLogoFallback');
+      if (globalInstData.logo) {
+        logoImg.src = globalInstData.logo;
+        logoImg.style.display = 'block';
+        logoFallback.style.display = 'none';
+      } else {
+        logoImg.style.display = 'none';
+        if (document.getElementById('instMostrarNome').checked) {
+          logoFallback.textContent = nome || 'Nome Empresa';
+          logoFallback.style.display = 'block';
+        } else {
+          logoFallback.style.display = 'none';
+        }
+      }
+
+      const sloganEl = document.getElementById('prevSlogan');
+      if (document.getElementById('instMostrarSlogan').checked && slogan) {
+        sloganEl.textContent = slogan;
+        sloganEl.style.display = 'block';
+      } else {
+        sloganEl.style.display = 'none';
+      }
+
+      const infoEl = document.getElementById('prevInfo');
+      const parts = [];
+      if (document.getElementById('instMostrarTelefone').checked && telefone) parts.push(telefone);
+      if (document.getElementById('instMostrarSite').checked && site) parts.push(site);
+      if (document.getElementById('instMostrarInstagram').checked && instagram) parts.push(instagram);
+      if (parts.length > 0) { infoEl.textContent = parts.join(' | '); infoEl.style.display = 'block'; }
+      else { infoEl.style.display = 'none'; }
+
+      const qrImg = document.getElementById('prevQRCodeImg');
+      if (document.getElementById('instMostrarQRCode').checked && globalInstData.qrcode) {
+        qrImg.src = globalInstData.qrcode;
+        qrImg.style.display = 'block';
+      } else {
+        qrImg.style.display = 'none';
+      }
+    }
+
+    function setupPreviewListeners() {
+      ['instNome', 'instTelefone', 'instSite', 'instInstagram', 'instSlogan'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.bound) { el.addEventListener('input', updateLivePreview); el.dataset.bound = '1'; }
+      });
+      ['instMostrarNome', 'instMostrarTelefone', 'instMostrarSite', 'instMostrarInstagram', 'instMostrarSlogan', 'instMostrarQRCode'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.dataset.bound) { el.addEventListener('change', updateLivePreview); el.dataset.bound = '1'; }
+      });
+    }
+
+    // ===== STAT BAR =====
+    function renderStatBar(cfg, midias, streams, espStatus) {
+      const bar = document.getElementById('statBar');
+      const stats = [
+        { icon: '&#128421;', label: 'Servidor', value: 'Online', cls: 'ok', bg: 'green' },
+        { icon: '&#128264;', label: 'Som Midia', value: cfg && cfg.somMidia ? 'Ligado' : 'Desligado', cls: cfg && cfg.somMidia ? 'ok' : '', bg: 'blue' },
+        { icon: '&#127916;', label: 'Stream Ativo', value: streams && streams.some(s => s.ativo) ? 'Sim' : 'Nao', cls: streams && streams.some(s => s.ativo) ? 'ok' : '', bg: 'purple' },
+        { icon: '&#127912;', label: 'Midias', value: midias ? midias.filter(m => m.ativo).length + ' / ' + midias.length : '-', cls: '', bg: 'yellow' },
+        { icon: '&#9917;', label: 'Copa', value: espStatus ? (espStatus.ativo ? 'Ativo' : 'Inativo') : '-', cls: espStatus && espStatus.ativo ? 'ok' : (espStatus && espStatus.erro ? 'error' : ''), bg: 'red' }
+      ];
+      bar.innerHTML = stats.map(s => `
+        <div class="stat-card">
+          <div class="stat-icon ${s.bg}">${s.icon}</div>
+          <div>
+            <div class="stat-label">${s.label}</div>
+            <div class="stat-value ${s.cls}">${s.value}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ===== HEALTH MONITOR =====
+    async function carregarHealth() {
+      try {
+        const res = await fetch('/api/football/provider-health');
+        const data = await res.json();
+
+        const statusColors = { ok: 'green', degraded: 'yellow', error: 'red' };
+        const statusLabels = { ok: 'Saudavel', degraded: 'Degradado', error: 'Offline' };
+
+        document.getElementById('healthOverview').innerHTML = `
+          <div class="stat-card">
+            <div class="stat-icon green">&#9989;</div>
+            <div><div class="stat-label">Status Geral</div><div class="stat-value ${statusColors[data.status] || 'error'}">${statusLabels[data.status] || data.status}</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">&#127760;</div>
+            <div><div class="stat-label">Provedor Ativo</div><div class="stat-value">${data.activeProvider || '-'}</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow">&#128256;</div>
+            <div><div class="stat-label">Fallback</div><div class="stat-value">${data.fallbackProvider || '-'}</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">&#128161;</div>
+            <div><div class="stat-label">Provedores</div><div class="stat-value">${data.details ? Object.keys(data.details).length : 0}</div></div>
+          </div>
+        `;
+
+        const details = data.details || {};
+        document.getElementById('healthDetails').innerHTML = Object.entries(details).map(([name, info]) => {
+          const isOk = !info.lastError;
+          const isActive = name === data.activeProvider;
+          return `
+            <div class="health-card" style="${isActive ? 'border-color: var(--primary); border-width:2px;' : ''}">
+              <div class="health-card-title">
+                <span>${name} ${isActive ? '<span class="badge badge-green">ATIVO</span>' : ''}</span>
+                <span class="health-dot ${isOk ? 'green' : 'red'}"></span>
+              </div>
+              <div class="health-detail">
+                ${info.cacheStatus ? `Cache: <strong>${info.cacheStatus}</strong><br>` : ''}
+                ${info.lastSuccess ? `Ultimo sucesso: ${new Date(info.lastSuccess).toLocaleString('pt-BR')}<br>` : ''}
+                ${info.lastError ? `Erro: <span style="color:var(--danger);">${info.lastError.message || info.lastError}</span><br>` : ''}
+                ${info.lastDurationMs ? `Tempo: ${info.lastDurationMs}ms<br>` : ''}
+                ${info.gamesCount !== undefined ? `Jogos: ${info.gamesCount} | Grupos: ${info.groupsCount || 0} | Times: ${info.teamsCount || 0}<br>` : ''}
+                ${info.isRefreshing ? '<span style="color:var(--warning);">Atualizando...</span>' : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        document.getElementById('healthOverview').innerHTML = '<div class="stat-card"><div class="stat-icon red">&#10060;</div><div><div class="stat-label">Erro</div><div class="stat-value error">Falha ao carregar</div></div></div>';
+      }
+    }
+
+    // ===== LOAD ALL DATA =====
+    async function carregarDados() {
+      try {
+        const [instRes, configRes, midiasRes, streamsRes, espRes, chamadasRes] = await Promise.all([
+          fetch('/api/institucional').then(r => r.json()),
+          fetch('/api/config').then(r => r.json()),
+          fetch('/api/midias').then(r => r.json()),
+          fetch('/api/streams').then(r => r.json()),
+          fetch('/api/copa/status').then(r => r.json()),
+          fetch('/api/chamadas').then(r => r.json()).catch(() => [])
+        ]);
+
+        globalInstData = instRes;
+
+        // Institucional
+        document.getElementById('instNome').value = instRes.nome || '';
+        document.getElementById('instTelefone').value = instRes.telefone || '';
+        document.getElementById('instSite').value = instRes.site || '';
+        document.getElementById('instInstagram').value = instRes.instagram || '';
+        document.getElementById('instSlogan').value = instRes.slogan || '';
+        document.getElementById('instMostrarNome').checked = instRes.mostrarNome !== false;
+        document.getElementById('instMostrarTelefone').checked = instRes.mostrarTelefone !== false;
+        document.getElementById('instMostrarSite').checked = instRes.mostrarSite !== false;
+        document.getElementById('instMostrarInstagram').checked = instRes.mostrarInstagram !== false;
+        document.getElementById('instMostrarSlogan').checked = instRes.mostrarSlogan !== false;
+        document.getElementById('instMostrarQRCode').checked = instRes.mostrarQRCode === true;
+
+        const logoTxt = document.getElementById('logoStatusText');
+        const btnDelLogo = document.getElementById('btnDeleteLogo');
+        if (instRes.logo) {
+          logoTxt.innerHTML = '<span style="color:var(--success); font-weight:600;">Ativo:</span> ' + instRes.logo.split('/').pop();
+          btnDelLogo.style.display = '';
+        } else {
+          logoTxt.textContent = 'Nenhum logo enviado.';
+          btnDelLogo.style.display = 'none';
+        }
+
+        const qrTxt = document.getElementById('qrcodeStatusText');
+        const btnDelQR = document.getElementById('btnDeleteQRCode');
+        if (instRes.qrcode) {
+          qrTxt.innerHTML = '<span style="color:var(--success); font-weight:600;">Ativo:</span> ' + instRes.qrcode.split('/').pop();
+          btnDelQR.style.display = '';
+        } else {
+          qrTxt.textContent = 'Nenhum QR Code.';
+          btnDelQR.style.display = 'none';
+        }
+
+        setupPreviewListeners();
+        updateLivePreview();
+
+        // Config
+        document.getElementById('somMidiaCheckbox').checked = !!configRes.somMidia;
+
+        // Evento
+        try {
+          const evRes = await fetch('/api/evento');
+          const ev = await evRes.json();
+          document.getElementById('eventoCheckbox').checked = ev.ativo;
+        } catch(e) {}
+
+        // Copa config
+        try {
+          const ccRes = await fetch('/api/copa/config');
+          const cc = await ccRes.json();
+          if (cc) {
+            document.getElementById('esportesAtivo').checked = !!cc.ativo;
+            document.getElementById('esportesFallback').checked = !!cc.usarComoFallbackStream;
+            document.getElementById('esportesMostrarJogosHoje').checked = !!cc.mostrarJogosHoje;
+            document.getElementById('esportesMostrarProximos').checked = !!cc.mostrarProximosJogos;
+            document.getElementById('esportesMostrarClassificacao').checked = !!cc.mostrarClassificacaoGrupos;
+            if (cc.fonteDados) document.getElementById('esportesFonteDados').value = cc.fonteDados;
+            const lblApi = document.getElementById('lblSportsApiStatus');
+            const lblUpd = document.getElementById('lblSportsApiLastUpdate');
+            const lblErr = document.getElementById('lblSportsApiError');
+            lblApi.innerHTML = cc.ok !== false ? '<span style="color:var(--success);">Online</span>' : '<span style="color:var(--danger);">Erro</span>';
+            lblUpd.textContent = cc.ultimaAtualizacao ? new Date(cc.ultimaAtualizacao).toLocaleString('pt-BR') : 'Nunca';
+            if (cc.erro) { lblErr.textContent = 'Erro: ' + cc.erro; lblErr.style.display = ''; }
+            else { lblErr.style.display = 'none'; }
+          }
+        } catch(e) {}
+
+        // Midias
+        window.currentMidiasIds = midiasRes.map(m => m.id);
+        const mediaList = document.getElementById('mediaList');
+        mediaList.innerHTML = midiasRes.map((m, i) => {
+          const statusBadge = m.ativo ? '<span class="badge badge-green">Ativa</span>' : '<span class="badge badge-red">Inativa</span>';
+          const priorityBadge = m.reproduzirPrimeiro ? '<span class="badge badge-blue">PRIORIDADE</span>' : '';
+          const preview = m.tipo === 'imagem'
+            ? `<div style="width:48px;height:48px;border-radius:6px;overflow:hidden;flex-shrink:0;"><img src="${m.url}" style="width:100%;height:100%;object-fit:cover;"></div>`
+            : `<div style="width:48px;height:48px;background:#e2e8f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">&#127916;</div>`;
+          const isVirtual = ['copa_jogos_hoje', 'copa_proximos_jogos', 'copa_classificacao', 'youtube_stream'].includes(m.id);
+          return `<li style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              ${preview}
+              <div style="flex:1;overflow:hidden;">
+                <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.nome}</div>
+                <div style="font-size:0.75rem;color:var(--text-muted);">Ordem: ${m.ordem || i + 1}${m.tipo === 'imagem' || isVirtual ? ' | ' + (m.duracao || m.tempo || 10) + 's' : ''} ${priorityBadge}</div>
+              </div>
+              ${statusBadge}
+            </div>
+            <div class="btn-group" style="width:100%;">
+              <button onclick="moverMidia('${m.id}','cima')" class="btn btn-secondary btn-sm" ${i === 0 ? 'disabled' : ''}>&#8593;</button>
+              <button onclick="moverMidia('${m.id}','baixo')" class="btn btn-secondary btn-sm" ${i === midiasRes.length - 1 ? 'disabled' : ''}>&#8595;</button>
+              <button onclick="definirPrimeiraMidia('${m.id}')" class="btn btn-sm" style="background:var(--accent);color:#fff;">&#127941; Priorizar</button>
+              ${m.ativo
+                ? `<button onclick="alterarStatusMidia('${m.id}',false)" class="btn btn-secondary btn-sm">Desativar</button>`
+                : `<button onclick="alterarStatusMidia('${m.id}',true)" class="btn btn-primary btn-sm">Ativar</button>`}
+              <button onclick="testarMidia('${m.id}')" class="btn btn-sm" style="background:var(--primary);color:#fff;">Testar</button>
+              <button onclick="previsualizarMidia('${m.id}','${m.nome}','${m.tipo}','${m.url}')" class="btn btn-secondary btn-sm">Preview</button>
+              ${m.tipo === 'imagem' || isVirtual ? `<button onclick="editarDuracao('${m.id}',${m.duracao || m.tempo || 10})" class="btn btn-secondary btn-sm">&#9201; Duracao</button>` : ''}
+              ${isVirtual ? '' : `<button onclick="removerMidia('${m.id}')" class="btn btn-danger btn-sm">Remover</button>`}
+            </div>
+          </li>`;
+        }).join('');
+
+        // Streams
+        const streamList = document.getElementById('streamList');
+        function extractYT(url) {
+          const p = [/youtube\.com\/watch\?v=([^&]+)/, /youtu\.be\/([^?&]+)/, /youtube\.com\/live\/([^?&]+)/, /youtube\.com\/embed\/([^?&]+)/];
+          for (const r of p) { const m = url.match(r); if (m && m[1]) return m[1]; }
+          return null;
+        }
+        streamList.innerHTML = streamsRes.map(s => {
+          const ytid = extractYT(s.url);
+          const thumb = ytid ? `<div style="width:80px;height:50px;border-radius:6px;overflow:hidden;flex-shrink:0;"><img src="https://img.youtube.com/vi/${ytid}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;"></div>` : `<div style="width:80px;height:50px;background:#e2e8f0;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#128250;</div>`;
+          const statusBadge = s.ativo ? '<span class="badge badge-green">ATIVO</span>' : '<span style="font-size:0.75rem;color:var(--text-muted);">Inativo</span>';
+          return `<li style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+            <div style="display:flex;gap:0.75rem;align-items:center;">
+              ${thumb}
+              <div style="flex:1;overflow:hidden;">
+                <div style="font-weight:600;">YouTube Stream ${statusBadge}</div>
+                <a href="${s.url}" target="_blank" style="color:var(--accent);text-decoration:none;font-size:0.8rem;">${ytid ? 'youtu.be/' + ytid : s.url}</a>
+              </div>
+            </div>
+            <div class="btn-group">
+              <a href="${s.url}" target="_blank" class="btn btn-secondary btn-sm">Testar Link</a>
+              ${s.ativo
+                ? `<button onclick="alterarStatusStream('${s.id}',false)" class="btn btn-secondary btn-sm">Desativar</button>`
+                : `<button onclick="alterarStatusStream('${s.id}',true)" class="btn btn-primary btn-sm">Ativar</button>`}
+              <button onclick="removerStream('${s.id}')" class="btn btn-danger btn-sm">Remover</button>
+            </div>
+          </li>`;
+        }).join('');
+
+        // Status bar
+        renderStatBar(configRes, midiasRes, streamsRes, espStatus = espRes);
+
+        // Chamadas
+        carregarChamadas();
+        carregarHealth();
+      } catch (e) {
+        showToast('Erro ao carregar dados', 'error');
+      }
+    }
+
+    // ===== CHAMADAS =====
+    async function carregarChamadas() {
+      try {
+        const res = await fetch('/api/chamadas');
+        const data = await res.json();
+        const list = document.getElementById('chamadasList');
+        if (!data || data.length === 0) {
+          list.innerHTML = '<li style="justify-content:center;color:var(--text-muted);">Nenhuma chamada registrada</li>';
+          return;
+        }
+        list.innerHTML = data.slice(-20).reverse().map(c => {
+          const t = new Date(c.timestamp).toLocaleString('pt-BR');
+          return `<li><span><strong>Caixa ${c.caixa}</strong> - ${c.tipo || 'Normal'}</span><span style="color:var(--text-muted);font-size:0.75rem;">${t}</span></li>`;
+        }).join('');
+      } catch(e) {}
+    }
+
+    // ===== MIDIA FUNCTIONS =====
+    async function alterarStatusMidia(id, ativo) {
+      await fetch('/api/midias/' + id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ativo }) });
+      showToast(ativo ? 'Midia ativada!' : 'Midia desativada!');
+      carregarDados();
+    }
+
+    function removerMidia(id) {
+      showConfirm('Remover Midia', 'Deseja remover permanentemente?', async () => {
+        await fetch('/api/midias/' + id, { method: 'DELETE' });
+        showToast('Midia removida!');
+        carregarDados();
+      });
+    }
+
+    function editarDuracao(id, atual) {
+      showPrompt('Editar Duracao', 'Nova duracao em segundos:', atual, async (val) => {
+        const dur = parseInt(val, 10);
+        if (isNaN(dur) || dur <= 0) { showToast('Valor invalido', 'error'); return; }
+        await fetch('/api/midias/' + id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ duracao: dur, tempo: dur }) });
+        showToast('Duracao atualizada!');
+        carregarDados();
+      });
+    }
+
+    async function moverMidia(id, dir) {
+      const arr = [...window.currentMidiasIds];
+      const i = arr.indexOf(id);
+      if (i === -1) return;
+      if (dir === 'cima' && i > 0) { [arr[i-1], arr[i]] = [arr[i], arr[i-1]]; }
+      else if (dir === 'baixo' && i < arr.length - 1) { [arr[i], arr[i+1]] = [arr[i+1], arr[i]]; }
+      else return;
+      await fetch('/api/midias/reordenar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ordem: arr }) });
+      showToast('Ordem atualizada!');
+      carregarDados();
+    }
+
+    async function definirPrimeiraMidia(id) {
+      await fetch('/api/midias/' + id + '/reproduzir-primeiro', { method: 'POST' });
+      showToast('Definida como prioridade!');
+      carregarDados();
+    }
+
+    async function testarMidia(id) {
+      await fetch('/api/midias/' + id + '/testar', { method: 'POST' });
+      showToast('Teste enviado ao telao!');
+    }
+
+    function previsualizarMidia(id, nome, tipo, url) {
+      document.getElementById('previewTitle').textContent = nome;
+      document.getElementById('previewContent').innerHTML = tipo === 'imagem'
+        ? `<img src="${url}" style="max-width:100%;max-height:350px;object-fit:contain;border-radius:8px;">`
+        : `<video src="${url}" controls autoplay muted style="max-width:100%;max-height:350px;border-radius:8px;"></video>`;
+      document.getElementById('previewModal').classList.add('active');
+    }
+
+    function fecharPreviewModal() {
+      document.getElementById('previewContent').innerHTML = '';
+      document.getElementById('previewModal').classList.remove('active');
+    }
+
+    // ===== STREAM FUNCTIONS =====
+    async function alterarStatusStream(id, ativo) {
+      await fetch('/api/streams/' + id + '/ativar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ativo }) });
+      showToast(ativo ? 'Stream ativado!' : 'Stream desativado!');
+      carregarDados();
+    }
+
+    function removerStream(id) {
+      showConfirm('Remover Stream', 'Remover permanentemente?', async () => {
+        await fetch('/api/streams/' + id, { method: 'DELETE' });
+        showToast('Stream removido!');
+        carregarDados();
+      });
+    }
+
+    // ===== FORM SUBMITS =====
+    document.getElementById('mediaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('file', document.getElementById('mediaFile').files[0]);
+      fd.append('tempo', document.getElementById('mediaTempo').value);
+      await fetch('/api/midias', { method: 'POST', body: fd });
+      showToast('Midia enviada!');
+      document.getElementById('mediaFile').value = '';
+      carregarDados();
+    });
+
+    document.getElementById('streamForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = document.getElementById('streamUrl').value;
+      await fetch('/api/streams', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ url }) });
+      showToast('Stream adicionado!');
+      document.getElementById('streamUrl').value = '';
+      carregarDados();
+    });
+
+    document.getElementById('institucionalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        nome: document.getElementById('instNome').value,
+        telefone: document.getElementById('instTelefone').value,
+        site: document.getElementById('instSite').value,
+        instagram: document.getElementById('instInstagram').value,
+        slogan: document.getElementById('instSlogan').value,
+        mostrarNome: document.getElementById('instMostrarNome').checked,
+        mostrarTelefone: document.getElementById('instMostrarTelefone').checked,
+        mostrarSite: document.getElementById('instMostrarSite').checked,
+        mostrarInstagram: document.getElementById('instMostrarInstagram').checked,
+        mostrarSlogan: document.getElementById('instMostrarSlogan').checked,
+        mostrarQRCode: document.getElementById('instMostrarQRCode').checked
+      };
+      await fetch('/api/institucional', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+      showToast('Dados salvos!');
+      carregarDados();
+    });
+
+    document.getElementById('somMidiaCheckbox').addEventListener('change', async (e) => {
+      await fetch('/api/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ somMidia: e.target.checked }) });
+      showToast(e.target.checked ? 'Som ativado!' : 'Som desativado!');
+      carregarDados();
+    });
+
+    document.getElementById('eventoCheckbox').addEventListener('change', async (e) => {
+      await fetch('/api/evento/ativo', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ ativo: e.target.checked }) });
+      showToast(e.target.checked ? 'Modo Evento ativado!' : 'Modo Evento desativado!');
+      carregarDados();
+    });
+
+    document.getElementById('sportsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        ativo: document.getElementById('esportesAtivo').checked,
+        usarComoFallbackStream: document.getElementById('esportesFallback').checked,
+        fonteDados: document.getElementById('esportesFonteDados').value,
+        mostrarJogosHoje: document.getElementById('esportesMostrarJogosHoje').checked,
+        mostrarProximosJogos: document.getElementById('esportesMostrarProximos').checked,
+        mostrarClassificacaoGrupos: document.getElementById('esportesMostrarClassificacao').checked
+      };
+      await fetch('/api/copa/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+      showToast('Configuracoes da Copa salvas!');
+      carregarDados();
+    });
+
+    // ===== LOGO / QR UPLOAD =====
+    async function uploadLogo() {
+      const fi = document.getElementById('instLogoFile');
+      if (!fi.files[0]) { showToast('Selecione uma imagem', 'error'); return; }
+      const fd = new FormData();
+      fd.append('file', fi.files[0]);
+      const r = await fetch('/api/institucional/logo', { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.success) { showToast('Logo atualizado!'); fi.value = ''; carregarDados(); }
+      else showToast(d.error || 'Erro', 'error');
+    }
+
+    function deleteLogo() {
+      showConfirm('Excluir Logo', 'Remover o logotipo?', async () => {
+        await fetch('/api/institucional/logo', { method: 'DELETE' });
+        showToast('Logo removido!');
+        carregarDados();
+      });
+    }
+
+    async function uploadQRCode() {
+      const fi = document.getElementById('instQRCodeFile');
+      if (!fi.files[0]) { showToast('Selecione uma imagem', 'error'); return; }
+      const fd = new FormData();
+      fd.append('file', fi.files[0]);
+      const r = await fetch('/api/institucional/qrcode', { method: 'POST', body: fd });
+      const d = await r.json();
+      if (d.success) { showToast('QR Code atualizado!'); fi.value = ''; carregarDados(); }
+      else showToast(d.error || 'Erro', 'error');
+    }
+
+    function deleteQRCode() {
+      showConfirm('Excluir QR Code', 'Remover o QR Code?', async () => {
+        await fetch('/api/institucional/qrcode', { method: 'DELETE' });
+        showToast('QR Code removido!');
+        carregarDados();
+      });
+    }
+
+    // ===== CHAMADA TEST =====
+    async function testarChamadaForm() {
+      const num = parseInt(document.getElementById('testeCaixaNum').value, 10);
+      const tipo = document.getElementById('testeCaixaTipo').value;
+      if (isNaN(num) || num < 1) { showToast('Numero invalido', 'error'); return; }
+      const r = await fetch('/api/chamar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ caixa: num, tipo }) });
+      const d = await r.json();
+      if (d.success) showToast('Chamada enviada: Caixa ' + num + '!');
+      else showToast('Erro ao enviar', 'error');
+    }
+
+    async function testarChamadaForm2() {
+      const num = parseInt(document.getElementById('testeCaixaNum2').value, 10);
+      const tipo = document.getElementById('testeCaixaTipo2').value;
+      if (isNaN(num) || num < 1) { showToast('Numero invalido', 'error'); return; }
+      const r = await fetch('/api/chamar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ caixa: num, tipo }) });
+      const d = await r.json();
+      if (d.success) showToast('Chamada enviada: Caixa ' + num + '!');
+      else showToast('Erro ao enviar', 'error');
+      carregarChamadas();
+    }
+
+    // ===== COPA UPDATE =====
+    async function atualizarEsportesAgora() {
+      const r = await fetch('/api/copa/atualizar', { method: 'POST' });
+      const d = await r.json();
+      if (d.success) showToast('Dados atualizados!');
+      else showToast('Erro: ' + (d.error || 'Falha'), 'error');
+      carregarDados();
+    }
+
+    // ===== INIT =====
+    carregarDados();
+  </script>
+</body>
+</html>

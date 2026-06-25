@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Instalação - CHAMADOR DE CAIXA PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--primary), transparent);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section h2 {
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--primary) 100%);
+            border-radius: 4px;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .req-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .req-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .req-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+
+        .req-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: #ffffff;
+        }
+
+        .req-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .step {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .step:hover {
+            transform: translateX(4px);
+            border-color: rgba(99, 102, 241, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            font-weight: 800;
+            margin-right: 15px;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+        }
+
+        .step-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .step-content {
+            margin-left: 47px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .step-content p {
+            margin-bottom: 8px;
+        }
+
+        .file-structure {
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #8b949e;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .file-structure strong {
+            color: var(--accent);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.admin {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .badge.user {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        /* Callout blocks */
+        .callout {
+            border-left: 4px solid;
+            padding: 20px;
+            margin: 2rem 0;
+            border-radius: 0 16px 16px 0;
+            font-size: 0.9rem;
+        }
+
+        .callout.warning {
+            background: rgba(245, 158, 11, 0.04);
+            border-color: var(--warning);
+            color: #ffedd5;
+        }
+        .callout.warning strong { color: #f59e0b; }
+
+        .callout.success {
+            background: rgba(16, 185, 129, 0.04);
+            border-color: var(--success);
+            color: #ecfdf5;
+        }
+        .callout.success strong { color: #10b981; }
+
+        .callout.info {
+            background: rgba(6, 182, 212, 0.04);
+            border-color: var(--accent);
+            color: #ecfeff;
+        }
+        .callout.info strong { color: #06b6d4; }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        ul li {
+            margin-bottom: 6px;
+        }
+
+        .footer {
+            background: rgba(17, 24, 39, 0.4);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .footer strong {
+            color: #ffffff;
+        }
+
+        .footer p {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-badge">⚡ CHAMADOR DE CAIXA PRO</div>
+            <h1>Instalação do PDV Client</h1>
+            <p>Guia Passo a Passo de Implantação nos Caixas</p>
+        </div>
+
+        <div class="content">
+            <!-- Requisitos -->
+            <div class="section">
+                <h2>Requisitos de Sistema</h2>
+                <div class="requirements-grid">
+                    <div class="req-card">
+                        <span class="req-icon">💻</span>
+                        <div class="req-title">Sistema Operacional</div>
+                        <div class="req-desc">Windows 10, 11 ou superior. Versões x64 recomendadas.</div>
+                    </div>
+                    <div class="req-card">
+                        <span class="req-icon">🛡️</span>
+                        <div class="req-title">Privilégios Administrativos</div>
+                        <div class="req-desc">Necessário apenas no primeiro script para instalação em C:\.</div>
+                    </div>
+                    <div class="req-card">
+                        <span class="req-icon">🌐</span>
+                        <div class="req-title">Conexão de Rede</div>
+                        <div class="req-desc">Acesso à mesma rede local onde o servidor do telão está rodando.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estrutura de Arquivos -->
+            <div class="section">
+                <h2>Estrutura da Pasta de Instalação</h2>
+                <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    Certifique-se de manter todos os arquivos na mesma árvore de diretórios antes de rodar os instaladores:
+                </p>
+                <div class="file-structure">
+pdv-client/
+├── <strong>dist/</strong>
+│   └── <strong>win-unpacked/</strong>                        ← Executável compilado de produção
+│       ├── PDV Client.exe
+│       ├── icudtl.dat
+│       └── ... (arquivos internos do Electron)
+├── <strong>INSTALAR-PDV-CLIENT e ja cria atalho no inicio.bat</strong>  ← Instalação principal
+├── <strong>CRIAR-ATALHO-STARTUP_caso_nao_funcione.bat</strong>         ← Inicialização automática (backup)
+└── <strong>INSTALACAO-PDV-CLIENT.html</strong>                     ← Este manual de instrução
+                </div>
+            </div>
+
+            <!-- Passo a Passo -->
+            <div class="section">
+                <h2>Implantação Passo a Passo</h2>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Copiar a pasta para o computador do Caixa</div>
+                    </div>
+                    <div class="step-content">
+                        <p>Transfira a pasta compactada ou os arquivos completos do <strong>pdv-client</strong> para a máquina do caixa de destino (através de pendrive ou rede local).</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <div class="step-title">
+                            Executar a Instalação Principal
+                            <span class="badge admin">Como Administrador</span>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p><strong>Clique com o botão direito</strong> no arquivo <code>INSTALAR-PDV-CLIENT e ja cria atalho no inicio.bat</code> e escolha a opção <strong>"Executar como administrador"</strong>.</p>
+                        <p style="margin-top: 10px; font-weight: 600; color: #ffffff;">O que este script executa:</p>
+                        <ul>
+                            <li>Cria o diretório de produção <code>C:\PDV-Client\</code> e move os binários para lá.</li>
+                            <li>Cria o atalho do aplicativo na Área de Trabalho do operador.</li>
+                            <li>Cria o atalho de inicialização rápida com o Windows para o usuário atual.</li>
+                            <li>Inicia o aplicativo do caixa automaticamente.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <strong>⚠️ Atenção durante atualizações:</strong> Se o PDV Client já estiver rodando em segundo plano na máquina, feche-o clicando com o botão direito no ícone da bandeja do sistema (perto do relógio) e selecionando <strong>"Sair"</strong> antes de reinstalar.
+                </div>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <div class="step-title">
+                            Inicialização Automática Separada (Opcional/Backup)
+                            <span class="badge user">Como Usuário Comum</span>
+                        </div>
+                    </div>
+                    <div class="step-content">
+                        <p>Caso a inicialização automática não tenha sido registrada no Passo 2 por restrições de permissão do usuário de rede, dê um <strong>duplo clique normal (sem admin)</strong> no arquivo <code>CRIAR-ATALHO-STARTUP_caso_nao_funcione.bat</code>.</p>
+                        <p style="margin-top: 5px;">Isso irá forçar a criação do atalho diretamente na pasta pessoal de inicialização do Windows do operador local.</p>
+                    </div>
+                </div>
+
+                <div class="callout info">
+                    <strong>💡 Por que há diferença de privilégios nos arquivos?</strong><br>
+                    O instalador principal precisa de permissão de Administrador para criar pastas na unidade local <code>C:\</code>. Já o script de inicialização automática deve rodar sob o usuário comum (operador) para apontar o atalho de startup ao perfil de login correto de quem trabalhará no caixa.
+                </div>
+
+                <div class="callout success">
+                    <strong>🎉 Implantação do software executada com sucesso!</strong><br>
+                    O aplicativo está instalado, rodando de forma silenciosa e configurado para iniciar automaticamente ao ligar o computador do caixa.
+                </div>
+            </div>
+
+            <!-- Configuração -->
+            <div class="section">
+                <h2>Configuração Inicial do Caixa</h2>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <div class="step-title">Acessar a Tela de Configurações</div>
+                    </div>
+                    <div class="step-content">
+                        <p>Localize o ícone do **Chamador de Caixa Pro** na bandeja do Windows (ao lado do relógio no canto inferior direito).</p>
+                        <p>Dê um duplo clique no ícone ou clique com o botão direito e escolha **"Configurações"**.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <div class="step-title">Definir Parâmetros da Estação</div>
+                    </div>
+                    <div class="step-content">
+                        <p>Preencha os campos de acordo com a identificação do caixa:</p>
+                        <ul>
+                            <li><strong>Nº do Caixa:</strong> Identificador do caixa físico (ex: 1, 2, 3).</li>
+                            <li><strong>Tipo de Caixa:</strong> Escolha a categoria (ex: Normal, Preferencial, Rápido) para exibir o título adequado na tela.</li>
+                            <li><strong>Tecla de Atalho:</strong> A tecla física do teclado do PDV usada para chamar o cliente (ex: F5, F12 ou letras avulsas como Y).</li>
+                            <li><strong>Servidor WebSocket:</strong> Preencha com o endereço de rede do servidor (ex: <code>ws://192.168.1.100:3001</code>). Deixe o valor padrão caso o servidor e telão rodem no mesmo computador de testes.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <div class="step-title">Salvar e Conectar</div>
+                    </div>
+                    <div class="step-content">
+                        <p>Clique em <strong>"Salvar Configuração"</strong>.</p>
+                        <p>O aplicativo reiniciará a conexão WebSocket instantaneamente aplicando os novos parâmetros. O ícone da bandeja deverá ficar verde se a conexão for estabelecida.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uso -->
+            <div class="section">
+                <h2>Como Operar no Dia a Dia</h2>
+                <div class="step">
+                    <div class="step-content">
+                        <p><strong>1. Indicador de Conexão na Bandeja:</strong></p>
+                        <ul>
+                            <li>🟢 <strong>Verde / Conectado:</strong> Pronto para chamadas de caixa livre.</li>
+                            <li>🔴 <strong>Vermelho / Desconectado:</strong> O app está tentando se reconectar. Verifique se o servidor do telão está ligado e na mesma rede.</li>
+                        </ul>
+                        <br>
+                        <p><strong>2. Acionamento de Chamada:</strong></p>
+                        <ul>
+                            <li>Pressione a **tecla física configurada** (ex: `Y` ou `F5`) a qualquer momento, mesmo que esteja operando com a janela do sistema de vendas ativa.</li>
+                            <li>O telão central piscará a informação da sua estação com um aviso sonoro.</li>
+                            <li>O operador ouvirá um feedback sonoro local (campainha ou fala sintetizada) para confirmar que o chamado foi enviado com sucesso.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>CHAMADOR DE CAIXA PRO - PDV CLIENT</strong></p>
+            <p>Desenvolvido para máxima agilidade e eficiência de atendimento no varejo.</p>
+            <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.6;">
+                Copyright © 2026. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

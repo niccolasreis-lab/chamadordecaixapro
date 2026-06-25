@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Configuração PDV</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #F4F6F8;
+      color: #1A2E45;
+      padding: 2rem;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #1A2E45; }
+    .field { margin-bottom: 1.25rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.9rem; color: #6B7A8D; text-transform: uppercase; letter-spacing: 1px; }
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #E0E6ED;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #fff;
+      color: #1A2E45;
+    }
+    input:focus, select:focus { outline: none; border-color: #00C853; }
+    .btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: #00C853;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { background: #00a844; }
+    .success { color: #00C853; font-weight: 600; margin-top: 1rem; display: none; text-align: center; }
+    .hint { font-size: 0.85rem; color: #6B7A8D; margin-top: 0.4rem; }
+  </style>
+</head>
+<body>
+  <div style="text-align: center; margin-bottom: 1rem;">
+    <img src="assets/logo.jpeg" alt="Logo" style="max-height: 80px; border-radius: 8px;">
+  </div>
+  <h1 style="text-align: center;">⚙️ Configuração desta Estação</h1>
+
+  <div class="field">
+    <label>Número do Caixa</label>
+    <input type="number" id="caixa" min="1" max="99" value="1">
+  </div>
+
+  <div class="field">
+    <label>Tipo do Caixa</label>
+    <select id="tipo">
+      <!-- Populado dinamicamente via IPC tipos-data -->
+    </select>
+    <div class="hint" id="tipos-status">Carregando tipos do servidor...</div>
+  </div>
+
+  <div class="field">
+    <label>Tecla de Atalho</label>
+    <input type="text" id="hotkey" placeholder="Y" maxlength="10">
+    <div class="hint">Tecla para acionar o telão (ex: Y, F9, F12). F9 sempre funciona como fallback.</div>
+  </div>
+
+  <div class="field">
+    <label>Intervalo entre Chamadas (Cooldown)</label>
+    <input type="number" id="cooldown" min="0" max="60" step="0.5" value="2">
+    <div class="hint">Tempo de espera em segundos entre acionamentos para evitar chamadas duplicadas por engano (ex: 2). Use 0 para desativar.</div>
+  </div>
+
+  <div class="field">
+    <label>Pasta de Chamadas</label>
+    <input type="text" id="watchDir" placeholder="\\srvsistema\GERTEC\chamada">
+    <div class="hint">Pasta compartilhada onde o arquivo será gravado ao acionar (ex: \\srvsistema\GERTEC\chamada)</div>
+  </div>
+
+  <div class="field">
+    <label>URL do Servidor WebSocket <span style="font-weight:400;color:#00C853">(opcional)</span></label>
+    <input type="text" id="serverUrl" placeholder="Deixe vazio para descoberta automática">
+    <div class="hint">Se vazio, o app encontra o servidor automaticamente na rede. Preencha apenas se a descoberta automática não funcionar (ex: ws://192.168.3.33:8080)</div>
+  </div>
+
+  <div class="field">
+    <label>Som desta Estação</label>
+    <select id="soundMode">
+      <option value="voice">🗣️ Voz (síntese)</option>
+      <option value="bell">🔔 Campainha</option>
+      <option value="none">🔇 Silencioso</option>
+    </select>
+    <div style="margin-top:0.75rem;">
+      <input type="range" id="soundVolume" min="0" max="1" step="0.05" style="margin-bottom:0.3rem;">
+      <div id="volumeLabel" style="font-size:0.9rem;color:#1A2E45;font-weight:600;">Volume: 80%</div>
+    </div>
+    <div class="hint">Feedback sonoro local desta estação ao acionar o caixa. Não afeta o som do telão.</div>
+  </div>
+
+  <button class="btn" onclick="save()">💾 Salvar Configuração</button>
+  <div class="success" id="success">✅ Configuração salva com sucesso!</div>
+
+  <script>
+    const { ipcRenderer } = require('electron')
+
+    ipcRenderer.send('get-config')
+    ipcRenderer.send('get-tipos')
+
+    ipcRenderer.on('config-data', (e, config) => {
+      document.getElementById('caixa').value = config.caixa
+      window._currentTipo = config.tipo
+      document.getElementById('hotkey').value = config.hotkey || 'F12'
+      document.getElementById('cooldown').value = config.cooldown !== undefined ? config.cooldown : 2
+      document.getElementById('watchDir').value = config.watchDir || '\\\\srvsistema\\GERTEC\\chamada'
+      document.getElementById('serverUrl').value = config.serverUrl || ''
+      document.getElementById('soundMode').value = config.sound?.mode ?? 'bell'
+      const vol = config.sound?.volume ?? 0.8
+      document.getElementById('soundVolume').value = vol
+      document.getElementById('volumeLabel').textContent = 'Volume: ' + Math.round(vol * 100) + '%'
+    })
+
+    function populateTiposSelect(tipos, currentTipo) {
+      const select = document.getElementById('tipo')
+      select.innerHTML = ''
+      for (const tipo of tipos) {
+        const option = document.createElement('option')
+        option.value = tipo.key
+        option.textContent = tipo.icone + ' ' + tipo.key
+        select.appendChild(option)
+      }
+      const exists = tipos.some(t => t.key === currentTipo)
+      select.value = exists ? currentTipo : tipos[0].key
+    }
+
+    ipcRenderer.on('tipos-data', (e, tipos) => {
+      populateTiposSelect(tipos, window._currentTipo || 'Normal')
+      // Detectar se veio do servidor ou é fallback
+      const isDefault = tipos.length === 3 && tipos[0].key === 'Normal' && tipos[1].key === 'Preferencial'
+      // Nota: não há como distinguir com certeza, então mostrar status genérico
+      document.getElementById('tipos-status').textContent = '✅ Tipos carregados'
+    })
+
+    document.getElementById('soundVolume').addEventListener('input', function() {
+      document.getElementById('volumeLabel').textContent = 'Volume: ' + Math.round(this.value * 100) + '%'
+    })
+
+    function save() {
+      const config = {
+        caixa: parseInt(document.getElementById('caixa').value),
+        tipo: document.getElementById('tipo').value,
+        hotkey: document.getElementById('hotkey').value.trim() || 'F12',
+        cooldown: parseFloat(document.getElementById('cooldown').value) ?? 2,
+        watchDir: document.getElementById('watchDir').value.trim(),
+        serverUrl: document.getElementById('serverUrl').value.trim(),
+        sound: {
+          mode: document.getElementById('soundMode').value,
+          volume: parseFloat(document.getElementById('soundVolume').value)
+        }
+      }
+      ipcRenderer.send('save-config', config)
+    }
+
+    ipcRenderer.on('config-saved', () => {
+      const s = document.getElementById('success')
+      s.style.display = 'block'
+      setTimeout(() => s.style.display = 'none', 3000)
+    })
+  </script>
+</body>
+</html>

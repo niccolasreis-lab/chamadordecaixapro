@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html,YY body {
+      background: transparent;
+      margin: 0;
+      padding: 8px;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+    .toast {
+      background: #1A2E45;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      border-left: 5px solid #00C853;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast">🔔 Aguardando...</div>
+  <script>
+    const { ipcRenderer } = require('electron')
+
+    ipcRenderer.on('show-message', (e, { message, color }) => {
+      const toast = document.getElementById('toast')
+      toast.textContent = message
+      toast.style.borderLeftColor = color
+    })
+
+    /**
+     * Toca o som de feedback local na estação PDV.
+     *
+     * @param {'voice'|'bell'|'none'} mode - Modo de som
+     * @param {number} volume - Volume entre 0.0 e 1.0
+     */
+    function playLocalSound(mode, volume) {
+      if (mode === 'none') return
+
+      if (mode === 'bell') {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)()
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain)
+          gain.connect(ctx.destination)
+          osc.type = 'sine'
+          osc.frequency.setValueAtTime(880, ctx.currentTime)
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.4)
+          gain.gain.setValueAtTime(volume, ctx.currentTime)
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
+          osc.start(ctx.currentTime)
+          osc.stop(ctx.currentTime + 0.6)
+          osc.onended = () => ctx.close()
+        } catch { /* ignorar erros de áudio */ }
+        return
+      }
+
+      if (mode === 'voice') {
+        try {
+          const utterance = new SpeechSynthesisUtterance('Caixa livre')
+          utterance.lang = 'pt-BR'
+          utterance.volume = volume
+          window.speechSynthesis.speak(utterance)
+        } catch { /* ignorar erros de síntese */ }
+      }
+    }
+
+    ipcRenderer.on('play-sound', (e, { mode, volume }) => {
+      playLocalSound(mode, volume)
+    })
+  </script>
+</body>
+</html>

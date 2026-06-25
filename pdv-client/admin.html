@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuração - CHAMADOR DE CAIXA PRO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #06b6d4;
+      --accent-hover: #0891b2;
+      --success: #10b981;
+      --bg-gradient: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%);
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --input-bg: rgba(31, 41, 55, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 18px;
+      margin-bottom: 1rem;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: rotate(45deg);
+      animation: shine 4s infinite linear;
+    }
+
+    @keyframes shine {
+      0% { transform: translate(-50%, -50%) rotate(45deg); }
+      100% { transform: translate(50%, 50%) rotate(45deg); }
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 18px;
+    }
+
+    .title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+      background: rgba(31, 41, 55, 0.8);
+    }
+
+    select option {
+      background: #111827;
+      color: var(--text-main);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      line-height: 1.3;
+    }
+
+    .row-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Som Controls */
+    .sound-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-test {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-test:hover {
+      background: var(--accent);
+      color: #0b0f19;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+    }
+
+    .slider-container {
+      margin-top: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.75rem;
+      border-radius: 10px;
+      border: 1px dashed rgba(255, 255, 255, 0.05);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      outline: none;
+      padding: 0;
+      border: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    /* Actions */
+    .btn-save {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    .success {
+      color: var(--success);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      display: none;
+      text-align: center;
+      padding: 0.5rem;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+      background: rgba(255,255,255,0.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container" id="logo-wrapper">
+        <span class="logo-icon" id="fallback-icon">🛒</span>
+      </div>
+      <h1 class="title">CHAMADOR DE CAIXA</h1>
+      <div class="subtitle">PDV Client PRO v1.0.0</div>
+    </div>
+
+    <!-- Caixa e Tipo -->
+    <div class="row-fields">
+      <div class="field">
+        <label for="caixa">Nº do Caixa</label>
+        <input type="number" id="caixa" min="1" max="99" value="1">
+      </div>
+      <div class="field">
+        <label for="tipo">Tipo</label>
+        <select id="tipo">
+          <!-- Populado via IPC -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Tecla e Cooldown -->
+    <div class="row-fields">
+      <div class="field">
+        <label for="hotkey">Tecla de Atalho</label>
+        <input type="text" id="hotkey" placeholder="Y" maxlength="10">
+        <div class="hint">Ex: Y, F5, F12. Atalho: Ctrl+Shift+Tecla.</div>
+      </div>
+      <div class="field">
+        <label for="cooldown">Espera (seg)</label>
+        <input type="number" id="cooldown" min="0" max="60" step="0.5" value="2">
+        <div class="hint">Prevenir duplo clique.</div>
+      </div>
+    </div>
+
+    <!-- Pasta de Rede -->
+    <div class="field">
+      <label for="watchDir">Pasta Compartilhada (Rede)</label>
+      <input type="text" id="watchDir" placeholder="\\servidor\compartilhamento">
+      <div class="hint">Diretório compartilhado opcional para fallback via arquivo.</div>
+    </div>
+
+    <!-- WebSocket Server -->
+    <div class="field">
+      <label for="serverUrl">Servidor WebSocket</label>
+      <input type="text" id="serverUrl" placeholder="ws://localhost:3040">
+      <div class="hint">Conexão em tempo real. Deixe vazio para usar a porta 3040 padrão.</div>
+    </div>
+
+    <!-- Som da Estação -->
+    <div class="field">
+      <div class="sound-header">
+        <label for="soundMode">Feedback Sonoro Local</label>
+        <button class="btn-test" onclick="testSound()">🔊 Testar</button>
+      </div>
+      <select id="soundMode">
+        <option value="voice">🗣️ Voz de Sintetizador ("Caixa Livre")</option>
+        <option value="bell">🔔 Campainha Tradicional</option>
+        <option value="none">🔇 Silencioso</option>
+      </select>
+      
+      <div class="slider-container">
+        <div class="slider-header">
+          <span>Volume do Som</span>
+          <span id="volumeLabel">80%</span>
+        </div>
+        <input type="range" id="soundVolume" min="0" max="1" step="0.05" value="0.8">
+      </div>
+    </div>
+
+    <button class="btn-save" onclick="save()">
+      <span>💾</span> Salvar Configuração
+    </button>
+    
+    <div class="success" id="success">✅ Configurações salvas e aplicadas!</div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const path = require('path');
+    const fs = require('fs');
+
+    // Verificar se existe logo.jpeg local na pasta assets
+    // Se existir, coloca a tag img no lugar do emoji
+    const logoWrapper = document.getElementById('logo-wrapper');
+    const logoPath = path.join(__dirname, 'assets', 'logo.jpeg');
+    if (fs.existsSync(logoPath)) {
+      logoWrapper.innerHTML = `<img src="assets/logo.jpeg" class="logo-img" alt="Logo">`;
+    }
+
+    // Carregar configurações iniciais
+    ipcRenderer.send('get-config');
+    ipcRenderer.send('get-tipos');
+
+    ipcRenderer.on('config-data', (e, config) => {
+      document.getElementById('caixa').value = config.caixa || 1;
+      window._currentTipo = config.tipo || 'Normal';
+      document.getElementById('hotkey').value = config.hotkey || 'Y';
+      document.getElementById('cooldown').value = config.cooldown !== undefined ? config.cooldown : 2;
+      document.getElementById('watchDir').value = config.watchDir || '';
+      document.getElementById('serverUrl').value = config.serverUrl || 'ws://localhost:3040';
+      document.getElementById('soundMode').value = config.sound?.mode ?? 'bell';
+      const vol = config.sound?.volume ?? 0.8;
+      document.getElementById('soundVolume').value = vol;
+      document.getElementById('volumeLabel').textContent = Math.round(vol * 100) + '%';
+    });
+
+    ipcRenderer.on('tipos-data', (e, tipos) => {
+      const select = document.getElementById('tipo');
+      select.innerHTML = '';
+      tipos.forEach(tipo => {
+        const option = document.createElement('option');
+        option.value = tipo.key;
+        option.textContent = (tipo.icone || '🛒') + ' ' + tipo.key;
+        select.appendChild(option);
+      });
+      if (window._currentTipo) {
+        select.value = window._currentTipo;
+      }
+    });
+
+    document.getElementById('soundVolume').addEventListener('input', function() {
+      document.getElementById('volumeLabel').textContent = Math.round(this.value * 100) + '%';
+    });
+
+    // Testar som localmente
+    function testSound() {
+      const mode = document.getElementById('soundMode').value;
+      const volume = parseFloat(document.getElementById('soundVolume').value);
+
+      if (mode === 'none') return;
+      if (mode === 'bell') {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.4);
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.6);
+        } catch (e) {
+          console.error(e);
+        }
+      } else if (mode === 'voice') {
+        const serverUrl = document.getElementById('serverUrl').value.trim();
+        const caixa = parseInt(document.getElementById('caixa').value);
+        const tipo = document.getElementById('tipo').value;
+
+        if (serverUrl && caixa) {
+          try {
+            const httpBase = serverUrl.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://');
+            const numStr = String(caixa);
+            const tipoSafe = (tipo || 'Normal').toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const isNormal = tipoSafe === 'normal';
+            const suffix = isNormal ? '' : `_${tipoSafe}`;
+            const filename = `caixa livre_${numStr}${suffix}.mp3`;
+            const url = `${httpBase}/narracoes/${encodeURIComponent(filename)}`;
+
+            const audio = new Audio(url);
+            audio.volume = volume;
+            audio.preload = 'auto';
+
+            let playedOrFailed = false;
+            const fallbackToTTS = () => {
+              if (playedOrFailed) return;
+              playedOrFailed = true;
+              try {
+                const text = isNormal ? `Caixa ${numStr}` : `Caixa ${numStr}`;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.volume = volume;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+              } catch (e) {
+                console.error(e);
+              }
+            };
+
+            audio.oncanplay = () => {
+              if (playedOrFailed) return;
+              playedOrFailed = true;
+              audio.play().catch(() => fallbackToTTS());
+            };
+
+            audio.onerror = () => {
+              fallbackToTTS();
+            };
+
+            setTimeout(fallbackToTTS, 3000);
+            return;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        try {
+          const utterance = new SpeechSynthesisUtterance('Caixa livre');
+          utterance.lang = 'pt-BR';
+          utterance.volume = volume;
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    function save() {
+      const config = {
+        caixa: parseInt(document.getElementById('caixa').value) || 1,
+        tipo: document.getElementById('tipo').value || 'Normal',
+        hotkey: document.getElementById('hotkey').value.trim().toUpperCase() || 'Y',
+        cooldown: parseFloat(document.getElementById('cooldown').value) || 2,
+        watchDir: document.getElementById('watchDir').value.trim(),
+        serverUrl: document.getElementById('serverUrl').value.trim(),
+        sound: {
+          mode: document.getElementById('soundMode').value,
+          volume: parseFloat(document.getElementById('soundVolume').value)
+        }
+      };
+      ipcRenderer.send('save-config', config);
+    }
+
+    ipcRenderer.on('config-saved', () => {
+      const s = document.getElementById('success');
+      s.style.display = 'block';
+      setTimeout(() => s.style.display = 'none', 3000);
+    });
+  </script>
+</body>
+</html>

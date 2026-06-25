@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalação PDV Client - Chamador de Caixa Livre</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.1em;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-content {
+            margin-left: 50px;
+            color: #555;
+        }
+
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .warning strong {
+            color: #856404;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .success strong {
+            color: #155724;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .info strong {
+            color: #0c5460;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .file-structure {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge.admin {
+            background: #dc3545;
+        }
+
+        .badge.user {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 PDV Client</h1>
+            <p>Guia de Instalação - Chamador de Caixa Livre</p>
+        </div>
+
+        <div class="content">
+            <!-- Requisitos -->
+            <div class="section">
+                <h2>📋 Requisitos</h2>
+                <ul>
+                    <li>Windows 10 ou superior</li>
+                    <li>Permissões de administrador (apenas para instalação)</li>
+                    <li>Acesso à rede local (para descoberta automática do servidor)</li>
+                </ul>
+            </div>
+
+            <!-- Estrutura de Arquivos -->
+            <div class="section">
+                <h2>📁 Estrutura de Arquivos</h2>
+                <p>Certifique-se de que a pasta <strong>pdv-client</strong> contém os seguintes arquivos:</p>
+                <div class="file-structure">
+pdv-client/
+├── dist/
+│   └── win-unpacked/          ← Pasta com o executável
+│       ├── PDV Client.exe
+│       ├── icudtl.dat
+│       └── ... (outros arquivos)
+├── INSTALAR-PDV-CLIENT.bat    ← Script de instalação
+└── CRIAR-ATALHO-STARTUP.bat   ← Script de inicialização automática
+                </div>
+            </div>
+
+            <!-- Passo a Passo -->
+            <div class="section">
+                <h2>🚀 Instalação Passo a Passo</h2>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Copiar a Pasta PDV Client
+                    </div>
+                    <div class="step-content">
+                        <p>Copie a pasta <strong>pdv-client</strong> completa para a máquina de destino.</p>
+                        <p>Você pode colocar em qualquer local temporário (ex: Desktop, Downloads).</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Executar Instalação Principal
+                        <span class="badge admin">COMO ADMINISTRADOR</span>
+                    </div>
+                    <div class="step-content">
+                        <p><strong>Clique com botão direito</strong> em <code>INSTALAR-PDV-CLIENT.bat</code></p>
+                        <p>Selecione <strong>"Executar como administrador"</strong></p>
+                        <br>
+                        <p><strong>O que este script faz:</strong></p>
+                        <ul>
+                            <li>✅ Copia os arquivos para <code>C:\PDV-Client\</code></li>
+                            <li>✅ Cria atalho na Área de Trabalho</li>
+                            <li>✅ Inicia o PDV Client automaticamente</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>⚠️ Atenção:</strong> Se o PDV Client já estiver rodando, feche-o antes de executar a instalação. Clique com botão direito no ícone da bandeja do sistema e escolha "Sair".
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Configurar Inicialização Automática
+                        <span class="badge user">COMO USUÁRIO NORMAL</span>
+                    </div>
+                    <div class="step-content">
+                        <p><strong>Clique duplo normal</strong> (SEM administrador) em <code>CRIAR-ATALHO-STARTUP.bat</code></p>
+                        <br>
+                        <p><strong>O que este script faz:</strong></p>
+                        <ul>
+                            <li>✅ Cria atalho na pasta Startup do usuário atual</li>
+                            <li>✅ PDV Client inicia automaticamente com o Windows</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info">
+                    <strong>ℹ️ Por que dois scripts?</strong><br>
+                    O primeiro precisa de admin para copiar arquivos para <code>C:\</code>. O segundo NÃO pode ser admin, senão cria o atalho no usuário errado (administrator em vez do operador).
+                </div>
+
+                <div class="success">
+                    <strong>✅ Instalação Concluída!</strong><br>
+                    O PDV Client está instalado e configurado para iniciar automaticamente com o Windows.
+                </div>
+            </div>
+
+            <!-- Configuração -->
+            <div class="section">
+                <h2>⚙️ Configuração</h2>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Abrir Configurações
+                    </div>
+                    <div class="step-content">
+                        <p>Clique com botão direito no ícone do PDV Client na bandeja do sistema (próximo ao relógio)</p>
+                        <p>Selecione <strong>"Configurações"</strong></p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Configurar Parâmetros
+                    </div>
+                    <div class="step-content">
+                        <p><strong>Número do Caixa:</strong> Digite o número do caixa (ex: 1, 2, 3...)</p>
+                        <p><strong>Tipo de Caixa:</strong> Selecione "Normal" ou "Prioritário"</p>
+                        <p><strong>Servidor:</strong> Deixe em branco para descoberta automática ou digite o IP manualmente</p>
+                        <p><strong>Pasta Compartilhada:</strong> Caminho da pasta de chamadas (padrão: <code>\\srvsistema\GERTEC\chamada</code>)</p>
+                        <p><strong>Tecla de Atalho:</strong> Tecla para chamar cliente (padrão: Y)</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Salvar Configurações
+                    </div>
+                    <div class="step-content">
+                        <p>Clique em <strong>"Salvar"</strong></p>
+                        <p>O PDV Client irá reconectar automaticamente com as novas configurações</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uso -->
+            <div class="section">
+                <h2>🎯 Como Usar</h2>
+
+                <div class="step">
+                    <div class="step-content">
+                        <p><strong>1. Verificar Conexão:</strong></p>
+                        <ul>
+                            <li>🟢 Ícone verde na bandeja = Conectado ao servidor</li>
+                            <li>🔴 Ícone vermelho na bandeja = Desconectado</li>
+                        </ul>
+                        <br>
+                        <p><strong>2. Chamar Cliente:</strong></p>
+                        <ul>
+                            <li>Pressione a tecla configurada (padrão: <strong>Y</strong>)</li>
+                            <li>O sistema envia a chamada para o telão</li>
+                            <li>Aguarde o tempo de cooldown configurado antes de chamar novamente</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solução de Problemas -->
+            <div class="section">
+                <h2>🔧 Solução de Problemas</h2>
+
+                <div class="step">
+                    <div class="step-title">PDV Client não inicia automaticamente</div>
+                    <div class="step-content">
+                        <p><strong>Solução:</strong> Execute novamente o <code>CRIAR-ATALHO-STARTUP.bat</code> como usuário normal (sem admin)</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">Ícone vermelho (desconectado)</div>
+                    <div class="step-content">
+                        <p><strong>Possíveis causas:</strong></p>
+                        <ul>
+                            <li>Servidor do telão não está rodando</li>
+                            <li>Firewall bloqueando a conexão</li>
+                            <li>IP do servidor configurado incorretamente</li>
+                        </ul>
+                        <p><strong>Solução:</strong> Verifique se o servidor está ativo e tente configurar o IP manualmente</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">Tecla de atalho não funciona</div>
+                    <div class="step-content">
+                        <p><strong>Solução:</strong> Abra as configurações e altere para outra tecla (ex: F1, F2, etc.)</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">Erro "Invalid file descriptor to ICU data"</div>
+                    <div class="step-content">
+                        <p><strong>Causa:</strong> Executável foi copiado isoladamente sem os arquivos de suporte</p>
+                        <p><strong>Solução:</strong> Execute o <code>INSTALAR-PDV-CLIENT.bat</code> novamente — ele copia todos os arquivos necessários</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desinstalação -->
+            <div class="section">
+                <h2>🗑️ Desinstalação</h2>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        Fechar o PDV Client
+                    </div>
+                    <div class="step-content">
+                        <p>Clique com botão direito no ícone da bandeja e escolha <strong>"Sair"</strong></p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        Remover Atalho da Inicialização
+                    </div>
+                    <div class="step-content">
+                        <p>Pressione <code>Win + R</code> e digite: <code>shell:startup</code></p>
+                        <p>Delete o atalho <strong>"PDV Client.lnk"</strong></p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        Remover Arquivos
+                    </div>
+                    <div class="step-content">
+                        <p>Delete a pasta <code>C:\PDV-Client\</code></p>
+                        <p>Delete o atalho da Área de Trabalho (se existir)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>PDV Client v1.0.0</strong></p>
+            <p>Sistema de Chamador de Caixa Livre</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Para suporte técnico, entre em contato com a equipe de TI
+            </p>
+        </div>
+    </div>
+</body>
+</html>

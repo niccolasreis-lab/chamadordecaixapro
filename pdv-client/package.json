@@ -1,0 +1,61 @@
+{
+  "name": "pdv-client",
+  "version": "1.0.0",
+  "description": "Cliente PDV - Chamador de Caixa Livre",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable",
+    "build:dir": "electron-builder --win --x64 --config.win.target=dir"
+  },
+  "build": {
+    "appId": "com.supermercado.pdv-client",
+    "productName": "PDV Client",
+    "publish": null,
+    "asar": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis"
+        },
+        {
+          "target": "portable"
+        }
+      ],
+      "signingHashAlgorithms": null,
+      "sign": null,
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": null,
+      "certificatePassword": null,
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PDV Client - Chamador de Caixa PRO",
+      "artifactName": "PDV_Client_Setup_${version}.${ext}"
+    },
+    "files": [
+      "main.js",
+      "popup.html",
+      "admin.html",
+      "config.json",
+      "assets/**/*"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    }
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^36.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.5",
+    "ws": "^8.18.2"
+  }
+}

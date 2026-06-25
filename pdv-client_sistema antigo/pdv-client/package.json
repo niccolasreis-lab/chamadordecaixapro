@@ -1,0 +1,50 @@
+{
+  "name": "pdv-client",
+  "version": "1.0.0",
+  "description": "Cliente PDV - Chamador de Caixa Livre",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.supermercado.pdv-client",
+    "productName": "PDV Client",
+    "publish": null,
+    "asar": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis"
+        },
+        {
+          "target": "dir"
+        }
+      ],
+      "signingHashAlgorithms": null,
+      "sign": null,
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": null,
+      "certificatePassword": null,
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "files": [
+      "main.js",
+      "popup.html",
+      "admin.html",
+      "config.json",
+      "assets/**/*",
+      "node_modules/**/*"
+    ]
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^36.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.5",
+    "ws": "^8.18.2"
+  }
+}

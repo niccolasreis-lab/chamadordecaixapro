@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Notificação - CHAMADOR DE CAIXA PRO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: transparent;
+      margin: 0;
+      padding: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    .toast {
+      background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+      color: #ffffff;
+      padding: 0.9rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-left: 4px solid #6366f1;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 4px solid #06b6d4;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .icon {
+      font-size: 1.2rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast" id="toast">
+    <span class="icon">🔔</span>
+    <span id="text">Aguardando chamada...</span>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('show-message', (e, { message, color }) => {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('text');
+      text.textContent = message;
+      toast.style.borderLeftColor = color || '#06b6d4';
+    });
+
+    /**
+     * Toca o som de feedback local na estação PDV.
+     */
+    function playLocalSound(data) {
+      const { mode, volume } = data;
+      if (mode === 'none') return;
+
+      if (mode === 'bell') {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.4);
+          gain.gain.setValueAtTime(volume, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.6);
+          osc.onended = () => ctx.close();
+        } catch (e) {
+          console.error(e);
+        }
+        return;
+      }
+
+      if (mode === 'voice') {
+        if (data.serverUrl && data.caixa) {
+          try {
+            const httpBase = data.serverUrl.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://');
+            const numStr = String(data.caixa);
+            const tipoSafe = (data.tipo || 'Normal').toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const isNormal = tipoSafe === 'normal';
+            const suffix = isNormal ? '' : `_${tipoSafe}`;
+            const filename = `caixa livre_${numStr}${suffix}.mp3`;
+            const url = `${httpBase}/narracoes/${encodeURIComponent(filename)}`;
+
+            const audio = new Audio(url);
+            audio.volume = volume;
+            audio.preload = 'auto';
+
+            let playedOrFailed = false;
+            const fallbackToTTS = () => {
+              if (playedOrFailed) return;
+              playedOrFailed = true;
+              try {
+                const text = isNormal ? `Caixa ${numStr}` : `Caixa ${numStr}`;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.volume = volume;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+              } catch (e) {
+                console.error(e);
+              }
+            };
+
+            audio.oncanplay = () => {
+              if (playedOrFailed) return;
+              playedOrFailed = true;
+              audio.play().catch(() => fallbackToTTS());
+            };
+
+            audio.onerror = () => {
+              fallbackToTTS();
+            };
+
+            setTimeout(fallbackToTTS, 3000);
+            return;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        try {
+          const utterance = new SpeechSynthesisUtterance('Caixa livre');
+          utterance.lang = 'pt-BR';
+          utterance.volume = volume;
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    ipcRenderer.on('play-sound', (e, data) => {
+      playLocalSound(data);
+    });
+  </script>
+</body>
+</html>

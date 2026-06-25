@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PDV Client - Configurações</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+    button { margin-top: 15px; padding: 10px; width: 100%; cursor: pointer; background: #007bff; color: white; border: none; }
+    button:hover { background: #0056b3; }
+    .info { margin-top: 15px; font-size: 0.9em; color: #555; }
+  </style>
+</head>
+<body>
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+    <img src="assets/logo.jpeg" alt="Logo Chamador de Caixa PRO" style="height: 40px; object-fit: contain;" />
+    <h2 style="margin: 0; font-size: 1.4rem; font-weight: bold; color: #111;">CHAMADOR DE CAIXA PRO</h2>
+  </div>
+  
+  <label>Número do Caixa:</label>
+  <input type="text" id="caixa" />
+
+  <label>Caminho de Fallback (Rede/Local):</label>
+  <input type="text" id="fallback" />
+
+  <button onclick="salvar()">Salvar Configurações</button>
+  <button onclick="testar()">Testar Chamada</button>
+
+  <div class="info">
+    Atalho Global: <strong>Ctrl + Shift + C</strong>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    async function loadConfig() {
+      const config = await ipcRenderer.invoke('get-config');
+      document.getElementById('caixa').value = config.caixa || '1';
+      document.getElementById('fallback').value = config.fallbackPath || 'C:\\chamador_fallback';
+    }
+
+    function salvar() {
+      const caixa = document.getElementById('caixa').value;
+      const fallbackPath = document.getElementById('fallback').value;
+      ipcRenderer.send('save-config', { caixa, fallbackPath });
+      alert('Configurações Salvas!');
+    }
+
+    function testar() {
+      ipcRenderer.send('test-call');
+    }
+
+    loadConfig();
+  </script>
+</body>
+</html>
