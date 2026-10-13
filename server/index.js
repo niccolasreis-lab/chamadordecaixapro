@@ -8,11 +8,35 @@ require('dotenv').config();
 
 const { initWebSocket } = require('./services/websocket');
 const apiRoutes = require('./routes/api');
+const { createScheduleRouter } = require('./routes/schedules');
+const { VignetteScheduler } = require('./services/vignetteScheduler');
+const { SubscriptionService } = require('./services/subscriptionService');
+const { managementQrSvg } = require('./services/subscriptionQr');
 
 const app = express();
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 3001;
+const subscription = new SubscriptionService();
+app.set('subscription', subscription);
+app.get('/api/subscription/status', (req, res) => {
+  res.set('Cache-Control', 'no-store').json({...subscription.publicStatus(),managementUrl:subscription.managementUrl()});
+});
+app.get('/subscription/unlock-qr.svg', (req, res) => {
+  const url = subscription.managementUrl();
+  if (!url) return res.status(404).send('Esta instalação ainda não está vinculada à central.');
+  res.set('Cache-Control', 'no-store').type('image/svg+xml').send(managementQrSvg(url));
+});
+app.use('/subscription', express.static(path.join(__dirname, 'public', 'subscription')));
+app.use((req, res, next) => {
+  if (req.path === '/admin/activation') return next();
+  if (subscription.isAllowed()) return next();
+  res.set('Cache-Control', 'no-store');
+  if (req.path.startsWith('/api/') || req.path.startsWith('/midias/') || req.path.startsWith('/uploads/') || req.path.startsWith('/sons/') || req.path.startsWith('/narracoes/')) {
+    return res.status(423).json({error:'SUBSCRIPTION_BLOCKED',...subscription.publicStatus()});
+  }
+  return res.status(200).sendFile(path.join(__dirname, 'public', 'subscription', 'blocked.html'));
+});
 
 app.use(cors());
 app.use(express.json());
@@ -42,6 +66,16 @@ const basicAuth = (req, res, next) => {
 };
 
 // Serve arquivos estáticos
+app.get('/admin/activation', basicAuth, (req, res) => {
+  res.set('Cache-Control', 'no-store').sendFile(path.join(__dirname, 'public', 'subscription', 'activation.html'));
+});
+app.post('/admin/activation', basicAuth, async (req, res) => {
+  if (req.headers.origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).json({error:'Origem inválida.'});
+  try {
+    const state = await subscription.activate(req.body.token, path.join(__dirname, '.env'));
+    res.set('Cache-Control', 'no-store').json(state);
+  } catch (error) { res.status(400).json({error:error.message}); }
+});
 app.use('/admin', basicAuth, express.static(path.join(__dirname, 'public', 'admin')));
 app.use('/midias', express.static(path.join(__dirname, 'data', 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
@@ -51,18 +85,22 @@ app.use('/sons', express.static(path.join(__dirname, 'sons')));
 app.get('/narracoes/:filename', (req, res) => {
   const filename = req.params.filename;
   
-  // Normaliza o nome do arquivo removendo zeros à esquerda do número do caixa para compatibilidade com arquivos físicos
-  // Ex: "caixa livre_01.mp3" -> "caixa livre_1.mp3"
-  // Ex: "caixa livre_03_preferencial.mp3" -> "caixa livre_3_preferencial.mp3"
+  // Mantém o nome solicitado como primeira opção. A API de narrações
+  // devolve os nomes reais dos arquivos, que podem conter zeros à esquerda.
+  // A versão normalizada permanece como compatibilidade com arquivos antigos.
   const normalizedFilename = filename.replace(/caixa livre_0*(\d+)/i, 'caixa livre_$1');
   
   // 1. Tenta buscar do diretório configurado
   const userNarrarDir = process.env.NARRAR_DIR || 'C:\\Users\\operador\\Documents\\CHAMADOR DE CAIXA PRO\\narrar caixa .mp3';
-  const userFilePath = path.join(userNarrarDir, normalizedFilename);
+  const userFilePaths = [filename, normalizedFilename]
+    .filter((name, index, names) => names.indexOf(name) === index)
+    .map(name => path.join(userNarrarDir, name));
   
   // 2. Tenta buscar do diretório local de fallback
   const localNarrarDir = path.join(__dirname, 'data', 'narracoes');
-  const localFilePath = path.join(localNarrarDir, normalizedFilename);
+  const localFilePaths = [filename, normalizedFilename]
+    .filter((name, index, names) => names.indexOf(name) === index)
+    .map(name => path.join(localNarrarDir, name));
   
   // Função auxiliar para verificar leitura e existência
   const isFileReadable = (filePath) => {
@@ -74,14 +112,11 @@ app.get('/narracoes/:filename', (req, res) => {
     }
   };
 
-  if (isFileReadable(userFilePath)) {
-    return res.sendFile(userFilePath);
-  } else if (isFileReadable(localFilePath)) {
-    return res.sendFile(localFilePath);
-  } else {
-    // Retorna 404 explicitamente em vez de deixar cair no SPA fallback
-    return res.status(404).send('Audio nao encontrado');
-  }
+  const audioPath = [...userFilePaths, ...localFilePaths].find(isFileReadable);
+  if (audioPath) return res.sendFile(audioPath);
+
+  // Retorna 404 explicitamente em vez de deixar cair no SPA fallback
+  return res.status(404).send('Audio nao encontrado');
 });
 
 
@@ -96,12 +131,20 @@ if (!fs.existsSync(instUploadsDir)) {
   fs.mkdirSync(instUploadsDir, { recursive: true });
 }
 
-// Rotas da API
-app.use('/api', apiRoutes);
-
 // Inicializa WebSocket
-const wss = initWebSocket(server);
+const wss = initWebSocket(server, { subscription });
+subscription.on('change', state => wss.broadcast({type:'SUBSCRIPTION_STATUS',data:state}));
 app.set('wss', wss);
+
+// Agendamentos usam o servidor como relogio autoritativo e enviam apenas a teloes registrados.
+const vignetteScheduler = new VignetteScheduler({
+  dataDir: path.join(__dirname, 'data'),
+  wss
+});
+app.set('vignetteScheduler', vignetteScheduler);
+app.use('/api/agendamentos', basicAuth, createScheduleRouter(vignetteScheduler));
+app.use('/api', apiRoutes);
+vignetteScheduler.start();
 
 // ---------------------------------------------------------
 // MONITORA PASTA DE FALLBACK (Chokidar)
@@ -128,6 +171,11 @@ if (fs.existsSync(FALLBACK_DIR)) {
 
   watcher.on('add', (filePath) => {
     if (path.extname(filePath) === '.json') {
+      if (!subscription.isAllowed()) {
+        // Descarta chamadas realizadas durante o bloqueio para não reproduzi-las após liberar.
+        fs.unlink(filePath, () => {});
+        return;
+      }
       try {
         console.log(`[Fallback] Arquivo detectado: ${filePath}`);
         const content = fs.readFileSync(filePath, 'utf8');
@@ -177,21 +225,42 @@ startWorldCupUpdateLoop();
 // Serve o Telão (SPA) a partir de dist/
 const DIST_DIR = path.join(__dirname, 'dist');
 if (fs.existsSync(DIST_DIR)) {
+  const serveTelao = (req, res) => {
+    const indexPath = path.join(DIST_DIR, 'index.html');
+    if (!fs.existsSync(indexPath)) return res.status(404).send('Telao nao encontrado. Execute o build.');
+    const html = fs.readFileSync(indexPath, 'utf8').replace('</head>', '<script src="/subscription/guard.js" defer></script></head>');
+    res.set('Cache-Control', 'no-store').type('html').send(html);
+  };
+  app.get(['/', '/index.html'], serveTelao);
   app.use(express.static(DIST_DIR));
   // SPA fallback — retorna index.html para qualquer rota não encontrada
   app.get('*', (req, res) => {
-    const indexPath = path.join(DIST_DIR, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).send('Telao nao encontrado. Execute o build.');
-    }
+    serveTelao(req, res);
   });
   console.log(`[Telao] Servindo SPA de: ${DIST_DIR}`);
 }
 
+async function startServer() {
+await subscription.refresh();
+subscription.start();
 server.listen(PORT, () => {
   console.log(`[Server] Chamador de Caixa Pro rodando na porta ${PORT}`);
   console.log(`[Server] Telao: http://0.0.0.0:${PORT}`);
   console.log(`[Server] Admin: http://0.0.0.0:${PORT}/admin`);
 });
+}
+startServer().catch(error => { console.error('[Server] Falha na inicialização:',error.message);process.exit(1); });
+
+let shuttingDown = false;
+function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log('[Server] Encerrando por ' + signal);
+  vignetteScheduler.stop();
+  subscription.stop();
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 5000).unref();
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));

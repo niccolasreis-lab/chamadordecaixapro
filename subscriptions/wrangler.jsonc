@@ -1,0 +1,9 @@
+{
+  "name": "chamador-assinaturas",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "d1_databases": [{ "binding": "DB", "database_name": "chamador-assinaturas", "database_id": "b8fb3a95-ceba-4f26-8f36-7dc048564d07" }]
+}

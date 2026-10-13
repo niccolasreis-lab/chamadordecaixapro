@@ -74,6 +74,7 @@ let soundWin = null
 let ws = null
 let isCooldown = false
 let reconnectTimer = null
+let subscriptionBlocked = false
 
 // ── UDP Discovery ─────────────────────────────────────────────────────────────
 const DISCOVERY_PORT = 41234
@@ -141,6 +142,12 @@ function connectWS(url) {
   ws.on('error', (e) => {
     console.error('[WS] Erro:', e.message)
   })
+  ws.on('message', raw => {
+    try {
+      const message = JSON.parse(raw.toString())
+      if (message.type === 'SUBSCRIPTION_STATUS') subscriptionBlocked = !message.data.allowed
+    } catch (_) {}
+  })
 
   ws.on('close', () => {
     console.warn('[WS] Desconectado, reconectando em 5s...')
@@ -165,6 +172,10 @@ function startConnection() {
 
 // ── Enviar chamada ────────────────────────────────────────────────────────────
 async function sendCall() {
+  if (subscriptionBlocked) {
+    console.warn('[Assinatura] Sistema bloqueado. Contato: www.nexareis.com.br / (11) 93710-5501')
+    return
+  }
   if (isCooldown) return
   const config = loadConfigWithDefaults()
   const num = String(config.caixa).padStart(2, '0')
@@ -197,6 +208,11 @@ async function sendCall() {
         body: JSON.stringify({ caixa: num, tipo })
       });
       clearTimeout(timeout);
+      if (response.status === 423) {
+        subscriptionBlocked = true;
+        console.warn('[Assinatura] Sistema bloqueado. Nenhuma contingência será acionada.');
+        return;
+      }
       if (response.ok) {
         console.log(`[PDV] Chamada enviada via HTTP: Caixa ${num}`);
         callSent = true;

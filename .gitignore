@@ -29,6 +29,9 @@ server/stderr.log
 .env.development.local
 .env.test.local
 .env.production.local
+.secrets/
+.wrangler/
+.dev.vars
 
 # Banco de Dados e Cache Local do Servidor
 server/data/*.json

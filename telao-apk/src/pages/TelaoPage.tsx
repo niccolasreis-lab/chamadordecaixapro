@@ -6,7 +6,8 @@
  */
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { useSubscription } from '../hooks/useSubscription';
 
 // Hooks
 import { useServerConfig } from '../hooks/useServerConfig';
@@ -39,6 +40,7 @@ export default function TelaoPage() {
   // Hooks de estado
   const { serverConfig, configModalVisible, setConfigModalVisible, handleSaveConfig } = useServerConfig();
   const resolvedServerUrl = buildServerUrl(serverConfig);
+  const subscriptionAllowed = useSubscription(resolvedServerUrl);
 
   const {
     midias, setMidias,
@@ -102,6 +104,24 @@ export default function TelaoPage() {
       ? resolveMediaUrl(institucional.qrcode, resolvedServerUrl)
       : '',
   }), [institucional, resolvedServerUrl]);
+
+  if (resolvedServerUrl && !subscriptionAllowed) {
+    return <View style={{ flex: 1, backgroundColor: '#0f172a', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+      <Text style={{ color: '#f1f5f9', fontSize: 48, fontWeight: '700', textAlign: 'center', marginBottom: 24 }}>Sistema bloqueado</Text>
+      <Text style={{ color: '#cbd5e1', fontSize: 26, textAlign: 'center', marginBottom: 32 }}>Entre em contato com a NexaReis para solicitar o desbloqueio e uma nova chave de ativação.</Text>
+      <TouchableOpacity accessibilityRole="link" onPress={() => { void Linking.openURL('https://www.nexareis.com.br/').catch(() => {}); }}>
+        <Text style={{ color: '#6ee7b7', fontSize: 30, marginBottom: 20 }}>www.nexareis.com.br</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="link" onPress={() => { void Linking.openURL('tel:+5511937105501').catch(() => {}); }}>
+        <Text style={{ color: '#6ee7b7', fontSize: 30 }}>(11) 93710-5501</Text>
+      </TouchableOpacity>
+      <Text style={{ color: '#cbd5e1', fontSize: 16, marginTop: 32 }}>Aguardando validação ou liberação da assinatura.</Text>
+      <TouchableOpacity accessibilityRole="button" onPress={() => setConfigModalVisible(true)}>
+        <Text style={{ color: '#cbd5e1', fontSize: 18, marginTop: 20 }}>Configurar servidor</Text>
+      </TouchableOpacity>
+      <ServerConfigModal visible={configModalVisible} currentIp={serverConfig.ip} currentPortApi={serverConfig.portApi} currentPortWs={serverConfig.portWs} onSave={handleSaveConfig} onCancel={() => setConfigModalVisible(false)} />
+    </View>;
+  }
 
   return (
     <TelaoLayout
