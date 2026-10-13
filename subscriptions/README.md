@@ -8,7 +8,11 @@ O acesso do proprietário está em `.secrets/acesso-assinaturas.txt`. Esse arqui
 
 No painel remoto, localize a instalação, escolha **Bloqueada** ou **Ativa**, informe o vencimento se necessário e clique em **Salvar assinatura**. O servidor consulta a central a cada 30 segundos. O telão web consulta o servidor a cada 5 segundos e recebe notificações por WebSocket; considere até 35 segundos para a atualização completa no navegador. Um bloqueio já recebido persiste quando a loja perde a internet ou reinicia.
 
-O telão web bloqueado exibe um QR code gerado localmente para abrir o painel remoto já filtrado para aquela instalação. Após entrar como proprietário, use **Desbloquear este telão**. O código contém apenas a URL e a identificação da instalação, sem senha, chave de ativação ou credencial Cloudflare; escanear sozinho não libera o sistema. A autenticação é do painel NexaReis hospedado na conta Cloudflare, não um login automático da conta Cloudflare.
+O telão web bloqueado exibe **dois QR codes**. O primeiro abre o WhatsApp da NexaReis no número **(11) 93710-5501**, pelo endereço `https://wa.me/5511937105501`. O segundo abre o painel de assinaturas na Cloudflare e exige o login do proprietário. Ambos permanecem imóveis e não contêm senha, chave de ativação ou credencial Cloudflare; escanear sozinho não libera o sistema.
+
+As imagens estão incorporadas à tela para aparecer na visualização local, inclusive sem conexão com o servidor. O QR administrativo incorporado aponta para o endereço geral da central; ao receber os dados do servidor, ele é substituído pelo QR existente gerado para a instalação correspondente. Os SVGs de referência estão em `server/public/subscription/whatsapp-qr.svg` e `server/public/subscription/management-qr.svg`.
+
+O link **Abrir painel de assinaturas** continua apontando para a instalação correspondente quando o servidor é consultado. Após entrar como proprietário, use **Desbloquear este telão**. A autenticação é do painel NexaReis hospedado na conta Cloudflare, não um login automático da conta Cloudflare.
 
 Um cliente ativo pode ficar sem internet até 24 horas desde a última validação assinada; o vencimento da assinatura prevalece quando ocorre antes. Na primeira ativação, sem cache válido, o sistema fica bloqueado até conseguir validar. Nenhum dado de pagamento é processado: esta versão faz gestão manual de assinatura e vencimento.
 

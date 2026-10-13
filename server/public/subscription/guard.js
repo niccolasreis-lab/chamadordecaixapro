@@ -11,6 +11,10 @@
         const management = document.getElementById('management-link');
         const qr = document.getElementById('unlock-qr');
         if (management && state.managementUrl) management.href = state.managementUrl;
+        const managementImage = document.getElementById('management-qr-image');
+        if (managementImage && state.managementUrl && managementImage.getAttribute('src') !== '/subscription/unlock-qr.svg') {
+          managementImage.src = '/subscription/unlock-qr.svg';
+        }
         if (qr) qr.hidden = !state.managementUrl;
         blockedPage.textContent = state.allowed ? 'Assinatura liberada. Abrindo o telão…' : 'Aguardando liberação da assinatura.' + (state.customerId ? ' Cliente: '+state.customerId : '');
         if (state.allowed) location.reload();
